@@ -1,0 +1,6 @@
+---
+import { getCollection, render } from 'astro:content'; import BaseLayout from '../../layouts/BaseLayout.astro'; import SiteHeader from '../../components/SiteHeader.astro'; import SiteFooter from '../../components/SiteFooter.astro';
+export async function getStaticPaths() { return (await getCollection('blog')).map((post) => ({ params: { slug: post.id }, props: { post } })); }
+const { post } = Astro.props; const { Content } = await render(post);
+---
+<BaseLayout title={`${post.data.title} | Diario Machupicchu Beyond`} description={post.data.excerpt}><SiteHeader /><main><article class="article-page"><p class="section-label">{post.data.place} · {post.data.date}</p><h1>{post.data.title}</h1><p class="article-excerpt">{post.data.excerpt}</p><div class="markdown-content"><Content /></div><a class="under-link" href="/diario">← Volver al diario</a></article></main><SiteFooter /></BaseLayout>

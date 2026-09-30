@@ -1,0 +1,11 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { waLink } from '../../data/site';
+export async function getStaticPaths() { return (await getCollection('tours')).map((tour) => ({ params: { slug: tour.id }, props: { tour } })); }
+const { tour } = Astro.props;
+const { Content } = await render(tour);
+---
+<BaseLayout title={`${tour.data.title} | Machupicchu Beyond`} description={tour.data.summary}><SiteHeader /><main><section class="detail-hero">{tour.data.image && <img src={tour.data.image} alt={tour.data.imageAlt || tour.data.title} width="1800" height="1100" fetchpriority="high" />}<div><p class="section-label section-label--light">{tour.data.kind} · {tour.data.place}</p><h1>{tour.data.title}</h1><p>{tour.data.summary}</p><a class="button button--gold" href={waLink(`Hola, quiero información sobre ${tour.data.title}.`)}>Consultar esta ruta ↗</a></div></section>{tour.data.referentialImage && <p class="image-note">Fotografía referencial del paisaje andino; no representa necesariamente esta ruta.</p>}<section class="detail-facts"><div><span>DURACIÓN</span><b>{tour.data.days}</b></div><div><span>GRUPO</span><b>{tour.data.group}</b></div><div><span>EXIGENCIA</span><b>{tour.data.level}</b></div><div><span>PRECIO</span><b>{tour.data.price}</b></div></section><section class="itinerary section-wrap"><p class="section-label">EL RECORRIDO</p><h2>Un viaje paso a <em>paso.</em></h2><div class="itinerary-grid">{tour.data.itinerary.map((day) => <article><span>{day.day}</span><h3>{day.title}</h3><p>{day.text}</p></article>)}</div><div class="included-grid"><div><h3>Incluye</h3><ul>{tour.data.includes.map((item) => <li>{item}</li>)}</ul></div><div><h3>No incluye</h3><ul>{tour.data.excludes.map((item) => <li>{item}</li>)}</ul></div></div><div class="markdown-content"><Content /></div>{tour.data.faq.length > 0 && <div class="faq-list">{tour.data.faq.map((item) => <details><summary>{item.q}<span>+</span></summary><p>{item.a}</p></details>)}</div>}<a class="button button--green" href={waLink(`Hola, quisiera consultar fechas y disponibilidad para ${tour.data.title}.`)}>Consultar disponibilidad ↗</a></section></main><SiteFooter /></BaseLayout>

@@ -1,0 +1,5 @@
+---
+import { getCollection } from 'astro:content'; import BaseLayout from '../../layouts/BaseLayout.astro'; import SiteHeader from '../../components/SiteHeader.astro'; import SiteFooter from '../../components/SiteFooter.astro';
+const posts = (await getCollection('blog')).sort((a,b) => b.data.date.localeCompare(a.data.date));
+---
+<BaseLayout title="Diario | Machupicchu Beyond"><SiteHeader /><main><section class="page-hero"><p class="section-label">NOTAS DESDE EL CAMINO</p><h1>Cuaderno de<br /><em>viaje.</em></h1><p>Ideas, historias y preguntas para acercarse al territorio andino.</p></section><section class="journal-grid section-wrap">{posts.map((post) => <article class="journal-card"><span>{post.data.place} · {post.data.date}</span><h2><a href={`/diario/${post.id}`}>{post.data.title}</a></h2><p>{post.data.excerpt}</p><a class="under-link" href={`/diario/${post.id}`}>Leer artículo ↗</a></article>)}</section></main><SiteFooter /></BaseLayout>

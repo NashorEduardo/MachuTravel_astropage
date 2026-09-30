@@ -1,0 +1,8 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+const tours = (await getCollection('tours')).sort((a,b) => a.data.order-b.data.order);
+---
+<BaseLayout title="Rutas | Machupicchu Beyond"><SiteHeader /><main><section class="page-hero"><p class="section-label">CUSCO · PERÚ / NUESTRAS EXPERIENCIAS</p><h1>Seis caminos.<br /><em>Una invitación.</em></h1><p>Encuentra la ruta que conecta con tu forma de explorar.</p></section><section class="catalog section-wrap"><div class="filters"><a href="/rutas">Todas las rutas</a><a href="/rutas?tipo=ceremonia">Ceremonias</a><a href="/rutas?tipo=peregrinacion">Peregrinaciones</a><a href="/rutas?tipo=iniciacion">Iniciación</a></div><div class="catalog-grid">{tours.map((tour) => <a class="catalog-card" href={`/rutas/${tour.id}`}>{tour.data.image ? <img src={tour.data.image} alt={tour.data.imageAlt || tour.data.title} loading="lazy" width="1200" height="800" /> : <div class="catalog-placeholder">M · B</div>}<div class="catalog-copy"><span>{tour.data.kind} · {tour.data.days}</span><h2>{tour.data.title}</h2><p>{tour.data.summary}</p><b>Ver experiencia ↗</b>{tour.data.referentialImage && <small>Imagen referencial</small>}</div></a>)}</div></section></main><SiteFooter /></BaseLayout>

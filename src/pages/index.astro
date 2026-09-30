@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { site, siteFaq, waLink } from '../data/site';
+const tours = (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.localeCompare(a.data.date));
+---
+
+<BaseLayout title="Machupicchu Beyond | Rutas que van más allá" description={site.description}>
+  <SiteHeader />
+
+  <main id="inicio">
+    <section class="hero hero--immersive" aria-labelledby="hero-title">
+      <img class="hero-backdrop" src="/images/journeys/machu-picchu-mist.jpg" alt="Machu Picchu entre la niebla de los Andes" width="2200" height="1467" fetchpriority="high" />
+      <div class="hero-overlay"></div>
+      <div class="hero-inner">
+        <p class="eyebrow">CUSCO · PERÚ <span>—</span> VIAJES CON SENTIDO</p>
+        <h1 id="hero-title">El camino<br />te lleva <em>más allá.</em></h1>
+        <p class="hero-description">Explora santuarios andinos, caminos de montaña y encuentros culturales desde una mirada cercana y respetuosa.</p>
+        <div class="hero-actions"><a class="button button--gold" href="/rutas">Explorar las rutas <span>↗</span></a><a class="hero-secondary" href="/nosotros">Conoce nuestra mirada</a></div>
+      </div>
+      <p class="hero-caption">MACHU PICCHU · CUSCO <span>FOTOGRAFÍA: GERRY SHEA / UNSPLASH</span></p>
+      <span class="hero-index">01 / 06</span>
+    </section>
+    <div class="marquee"><span>TIERRA · MEMORIA · CAMINO · DESCUBRIMIENTO · TIERRA · MEMORIA · CAMINO · DESCUBRIMIENTO ·</span></div>
+
+    <section class="intro section-wrap" id="esencia">
+      <div class="section-label"><span>01</span> UNA INVITACIÓN A EXPLORAR</div>
+      <div class="intro-grid"><h2>No venimos solo a mirar.<br /><em>Venimos a encontrarnos.</em></h2><div><p>Desde Cusco, diseñamos viajes que conectan el territorio andino con una forma más consciente de explorar. Cada ruta tiene su propio ritmo, paisaje y propósito.</p><a class="under-link" href="/nosotros">Nuestra forma de viajar <span>↗</span></a></div></div>
+    </section>
+
+    <section class="journeys section-wrap" id="rutas">
+      <div class="section-heading"><div><div class="section-label"><span>02</span> EXPERIENCIAS</div><h2>Elige tu <em>camino.</em></h2></div><a class="under-link" href="/rutas">Ver las seis rutas <span>↗</span></a></div>
+      <div class="journey-grid">
+        {tours.slice(0, 3).map((tour, i) => <a class:list={["journey-card", `journey-card--${i + 1}`]} href={`/rutas/${tour.id}`}>
+          {tour.data.image && <img src={tour.data.image} alt={tour.data.imageAlt || tour.data.title} loading="lazy" width="1200" height="800" />}
+          <span class="journey-count">0{i + 1} / {tour.data.kind}</span><div class="journey-info"><span>{tour.data.place} · {tour.data.days}</span><h3>{tour.data.title}</h3><p>{tour.data.summary}</p><b>Descubrir ruta <i>↗</i></b></div>
+        </a>)}
+      </div>
+    </section>
+
+    <section class="pathways"><div class="pathways-copy"><div class="section-label section-label--light"><span>03</span> TRES FORMAS DE RECORRER</div><h2>Un viaje.<br />Muchas <em>puertas.</em></h2><p>Hay rutas para caminar en silencio, compartir una ceremonia o iniciar una travesía de varios días. Encuentra la experiencia que resuena contigo.</p><a class="button button--gold" href="/ceremonias">Conoce las experiencias <span>↗</span></a></div><div class="pathway-list"><a href="/rutas?tipo=ceremonia"><span>01</span><div><h3>Ceremonias</h3><p>Espacios de encuentro guiados por facilitadores locales.</p></div><b>↗</b></a><a href="/rutas?tipo=peregrinacion"><span>02</span><div><h3>Peregrinaciones</h3><p>Caminar el paisaje altoandino con tiempo y atención.</p></div><b>↗</b></a><a href="/rutas?tipo=iniciacion"><span>03</span><div><h3>Rutas de iniciación</h3><p>Una primera aproximación a territorios de profunda memoria.</p></div><b>↗</b></a></div></section>
+
+    <section class="values section-wrap"><div class="section-heading"><div><div class="section-label"><span>04</span> NUESTRA MIRADA</div><h2>El respeto también<br />es parte del <em>viaje.</em></h2></div><p class="section-lead">El territorio no es un escenario. Nos acercamos con humildad, curiosidad y cuidado por quienes lo habitan.</p></div><div class="value-grid"><article><span>01 / VÍNCULO</span><h3>Autenticidad</h3><p>Conexión con la cultura, la historia y el territorio andino.</p></article><article><span>02 / CAMINO</span><h3>Aventura</h3><p>Rutas que invitan a explorar con presencia y apertura.</p></article><article><span>03 / LEGADO</span><h3>Herencia</h3><p>Respeto por las tradiciones y las comunidades locales.</p></article></div></section>
+
+    <section class="journal section-wrap"><div class="section-heading"><div><div class="section-label"><span>05</span> CUADERNO DE VIAJE</div><h2>Ideas para ir<br /><em>más profundo.</em></h2></div><a class="under-link" href="/diario">Leer el diario <span>↗</span></a></div><div class="journal-grid">{posts.slice(0, 2).map((post) => <article class="journal-card"><span>{post.data.place} · {new Date(post.data.date).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}</span><h3><a href={`/diario/${post.id}`}>{post.data.title}</a></h3><p>{post.data.excerpt}</p><a class="under-link" href={`/diario/${post.id}`}>Leer artículo <span>↗</span></a></article>)}</div></section>
+
+    <section class="faq section-wrap"><div><div class="section-label"><span>06</span> ANTES DE PARTIR</div><h2>Preguntas<br /><em>frecuentes.</em></h2><a class="under-link" href="/contacto">¿Tienes otra pregunta? Escríbenos <span>↗</span></a></div><div class="faq-list">{siteFaq.map((item) => <details><summary>{item.q}<span>+</span></summary><p>{item.a}</p></details>)}</div></section>
+
+    <section class="closing contact-band"><div><div class="section-label section-label--light">EL SIGUIENTE PASO</div><h2>Tu ruta comienza<br />con una <em>conversación.</em></h2><p>Cuéntanos qué te gustaría explorar. Te ayudamos a encontrar la experiencia adecuada.</p><a class="button button--gold" href={waLink('Hola, quisiera información sobre las experiencias de Machupicchu Beyond.')}>Conversemos por WhatsApp <span>↗</span></a></div><span class="closing-mark">M</span></section>\n  </main>
+
+  <SiteFooter />
+</BaseLayout>

@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+---
+<BaseLayout title="Página no encontrada | Machupicchu Beyond" description="La página que buscas no está disponible." noindex={true}><SiteHeader /><main id="main-content"><section class="not-found section-wrap"><p class="section-label">ERROR 404</p><p class="not-found-code">404</p><h1>Este camino no lleva<br />a donde <em>buscabas.</em></h1><p>La ruta pudo cambiar o la dirección ya no existe. Puedes volver al inicio o explorar nuestras experiencias.</p><div class="hero-actions"><a class="button button--green" href="/rutas">Explorar rutas ↗</a><a class="under-link" href="/">Volver al inicio</a></div></section></main><SiteFooter /></BaseLayout>

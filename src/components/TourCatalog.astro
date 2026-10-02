@@ -1,0 +1,24 @@
+---
+const { tours } = Astro.props;
+---
+<div class="catalog-grid">
+  {tours.map((tour: any) => {
+    const preview = tour.data.gallery?.[0] || tour.data.image;
+    return (
+      <a class="catalog-card" href={`/rutas/${tour.id}`} data-reveal data-tilt>
+        <div class="catalog-media">
+          {tour.data.image ? <img src={tour.data.image} alt={tour.data.imageAlt || tour.data.title} loading="lazy" width="1200" height="800" /> : <div class="catalog-placeholder">M · B</div>}
+          {preview && preview !== tour.data.image && <img class="catalog-thumb" src={preview} alt="" loading="lazy" width="320" height="220" />}
+          <span class="catalog-badge">{tour.data.tag}</span>
+        </div>
+        <div class="catalog-copy">
+          <div class="catalog-meta"><span>{tour.data.kind} · {tour.data.days}</span><small>{tour.data.place}</small></div>
+          <h2>{tour.data.title}</h2>
+          <p>{tour.data.summary}</p>
+          <b>Ver experiencia ↗</b>
+          {tour.data.referentialImage && <small>Imagen referencial</small>}
+        </div>
+      </a>
+    );
+  })}
+</div>

@@ -1,0 +1,13 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import TourCatalog from '../../components/TourCatalog.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+const KIND = 'ceremonia';
+const LABEL = 'Ceremonias';
+const TITLE = 'Encuentros';
+const tours = (await getCollection('tours')).filter((t) => t.data.kind === KIND).sort((a,b) => a.data.order-b.data.order);
+---
+<BaseLayout title={`${LABEL} en Cusco | Machupicchu Beyond`} description={`Explora ${LABEL.toLowerCase()} en Cusco y los Andes con Machupicchu Beyond.`}><SiteHeader /><main id="main-content"><section class="page-hero"><Breadcrumbs items={[{label:'Inicio',href:'/'},{label:'Rutas',href:'/rutas'},{label:LABEL}]} /><p class="section-label">RUTAS · CUSCO · PERÚ</p><h1>{TITLE}<br /><em>con sentido.</em></h1><p>Experiencias en grupos pequeños, con información clara y acompañamiento local.</p></section><section class="catalog section-wrap"><nav class="filters" aria-label="Filtrar rutas"><a href="/rutas">Todas</a><a class:list={[KIND==='ceremonia'?'is-active':'']} href="/rutas/ceremonias">Ceremonias</a><a class:list={[KIND==='peregrinacion'?'is-active':'']} href="/rutas/peregrinaciones">Peregrinaciones</a><a class:list={[KIND==='iniciacion'?'is-active':'']} href="/rutas/iniciacion">Iniciación</a></nav><TourCatalog tours={tours} /></section></main><SiteFooter /></BaseLayout>

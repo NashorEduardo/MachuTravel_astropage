@@ -3,9 +3,221 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
-import { waLink } from '../../data/site';
-export async function getStaticPaths() { return (await getCollection('tours')).map((tour) => ({ params: { slug: tour.id }, props: { tour } })); }
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TourCatalog from '../../components/TourCatalog.astro';
+import { absoluteUrl, site, waLink, testimonials } from '../../data/site';
+
+export async function getStaticPaths() {
+  return (await getCollection('tours')).map((tour) => ({ params: { slug: tour.id }, props: { tour } }));
+}
+
+const allTours = (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
 const { tour } = Astro.props;
 const { Content } = await render(tour);
+const tourUrl = absoluteUrl(`/rutas/${tour.id}`);
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'TouristTrip',
+  name: tour.data.title,
+  description: tour.data.summary,
+  url: tourUrl,
+  touristType: tour.data.kind,
+  provider: { '@type': 'TravelAgency', name: site.name, url: site.url },
+  ...(tour.data.image ? { image: absoluteUrl(tour.data.image) } : {}),
+};
+const faqSchema = tour.data.faq.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: tour.data.faq.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })),
+    }
+  : undefined;
+const rawGallery = [tour.data.image, ...tour.data.gallery].filter(Boolean) as string[];
+const galleryImages = rawGallery.length
+  ? Array.from({ length: Math.max(4, rawGallery.length) }, (_, index) => rawGallery[index % rawGallery.length])
+  : [];
+const relatedTours = allTours.filter((item) => item.id !== tour.id).sort((a, b) => Number(b.data.kind === tour.data.kind) - Number(a.data.kind === tour.data.kind)).slice(0, 3);
+const experiencePoints = [
+  { label: 'Experiencia', value: tour.data.subtitle },
+  { label: 'Territorio', value: tour.data.place },
+  { label: 'Estilo', value: tour.data.tag },
+];
+const highlightCards = [
+  ...tour.data.includes.slice(0, 3).map((item) => ({ title: item, text: 'Parte de la experiencia programada para esta ruta.' })),
+];
+const comments = testimonials.length
+  ? testimonials
+  : [
+      { quote: 'Ruta bien cuidada, con un ritmo amable y una logística clara.', name: 'Viajero Machupicchu Beyond', origin: 'Cusco' },
+    ];
 ---
-<BaseLayout title={`${tour.data.title} | Machupicchu Beyond`} description={tour.data.summary}><SiteHeader /><main><section class="detail-hero">{tour.data.image && <img src={tour.data.image} alt={tour.data.imageAlt || tour.data.title} width="1800" height="1100" fetchpriority="high" />}<div><p class="section-label section-label--light">{tour.data.kind} · {tour.data.place}</p><h1>{tour.data.title}</h1><p>{tour.data.summary}</p><a class="button button--gold" href={waLink(`Hola, quiero información sobre ${tour.data.title}.`)}>Consultar esta ruta ↗</a></div></section>{tour.data.referentialImage && <p class="image-note">Fotografía referencial del paisaje andino; no representa necesariamente esta ruta.</p>}<section class="detail-facts"><div><span>DURACIÓN</span><b>{tour.data.days}</b></div><div><span>GRUPO</span><b>{tour.data.group}</b></div><div><span>EXIGENCIA</span><b>{tour.data.level}</b></div><div><span>PRECIO</span><b>{tour.data.price}</b></div></section><section class="itinerary section-wrap"><p class="section-label">EL RECORRIDO</p><h2>Un viaje paso a <em>paso.</em></h2><div class="itinerary-grid">{tour.data.itinerary.map((day) => <article><span>{day.day}</span><h3>{day.title}</h3><p>{day.text}</p></article>)}</div><div class="included-grid"><div><h3>Incluye</h3><ul>{tour.data.includes.map((item) => <li>{item}</li>)}</ul></div><div><h3>No incluye</h3><ul>{tour.data.excludes.map((item) => <li>{item}</li>)}</ul></div></div><div class="markdown-content"><Content /></div>{tour.data.faq.length > 0 && <div class="faq-list">{tour.data.faq.map((item) => <details><summary>{item.q}<span>+</span></summary><p>{item.a}</p></details>)}</div>}<a class="button button--green" href={waLink(`Hola, quisiera consultar fechas y disponibilidad para ${tour.data.title}.`)}>Consultar disponibilidad ↗</a></section></main><SiteFooter /></BaseLayout>
+<BaseLayout title={`${tour.data.title} | Machupicchu Beyond`} description={tour.data.summary} image={tour.data.image || site.defaultImage} schema={faqSchema ? [schema, faqSchema] : schema}>
+  <SiteHeader />
+  <main id="main-content">
+    <div class="breadcrumb-wrap">
+      <Breadcrumbs items={[{ label: 'Inicio', href: '/' }, { label: 'Rutas', href: '/rutas' }, { label: tour.data.title }]} />
+    </div>
+
+    <section class="detail-hero detail-hero--layered">
+      {tour.data.image && <img src={tour.data.image} alt={tour.data.imageAlt || tour.data.title} width="1800" height="1100" fetchpriority="high" />}
+      <div>
+        <p class="section-label section-label--light">{tour.data.kind} · {tour.data.place}</p>
+        <h1>{tour.data.title}</h1>
+        <p>{tour.data.summary}</p>
+        <div class="detail-hero__actions">
+          <a class="button button--gold" href={waLink(`Hola, quiero información sobre ${tour.data.title}.`)}>Consultar esta ruta ↗</a>
+          <a class="hero-secondary hero-secondary--light" href="#otras-rutas">Ver otras rutas</a>
+        </div>
+      </div>
+      <aside class="detail-side-card" data-tilt>
+        <span>Ruta destacada</span>
+        <b>{tour.data.days}</b>
+        <p>{tour.data.group}</p>
+        <small>{tour.data.level}</small>
+      </aside>
+    </section>
+    {tour.data.referentialImage && <p class="image-note">Fotografía referencial del paisaje andino; no representa necesariamente esta ruta.</p>}
+
+    <section class="detail-facts">
+      <div><span>DURACIÓN</span><b>{tour.data.days}</b></div>
+      <div><span>GRUPO</span><b>{tour.data.group}</b></div>
+      <div><span>EXIGENCIA</span><b>{tour.data.level}</b></div>
+      <div><span>PRECIO</span><b>{tour.data.price}</b></div>
+    </section>
+
+    <section class="section-wrap detail-points" data-reveal>
+      <div class="detail-points__grid">
+        {experiencePoints.map((point) => (
+          <article data-tilt>
+            <span>{point.label}</span>
+            <h3>{point.value}</h3>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="itinerary section-wrap">
+      <div class="section-heading" data-reveal>
+        <div>
+          <p class="section-label">EL RECORRIDO</p>
+          <h2>Un viaje paso a <em>paso.</em></h2>
+        </div>
+        <p class="section-lead">Cada jornada propone un ritmo específico, pensado para que la experiencia no se sienta apresurada.</p>
+      </div>
+      <div class="itinerary-grid">
+        {tour.data.itinerary.map((day) => (
+          <article data-reveal data-tilt>
+            <span>{day.day}</span>
+            <h3>{day.title}</h3>
+            <p>{day.text}</p>
+          </article>
+        ))}
+      </div>
+
+      {galleryImages.length > 0 && (
+        <section class="tour-gallery" aria-labelledby="gallery-title" data-reveal>
+          <div class="section-heading">
+            <div>
+              <p class="section-label">IMÁGENES DEL CAMINO</p>
+              <h2 id="gallery-title">Una mirada al <em>territorio.</em></h2>
+            </div>
+            <p class="section-lead">Por ahora se reutilizan imágenes referenciales para construir una galería visual más completa.</p>
+          </div>
+          <div class="gallery-grid gallery-grid--mosaic">
+            {galleryImages.map((image, index) => (
+              <a href={image} target="_blank" rel="noopener noreferrer" class:list={[index === 0 ? 'gallery-grid__feature' : '']}>
+                <img src={image} alt={`${tour.data.title}, imagen ${index + 1}${tour.data.referentialImage ? ' referencial' : ''}`} loading="lazy" width="1200" height="800" />
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section class="tour-highlights" data-reveal>
+        <div>
+          <p class="section-label">QUÉ HACE ESPECIAL A ESTA RUTA</p>
+          <h2>Detalles que le dan <em>sentido.</em></h2>
+        </div>
+        <div class="tour-highlights__grid">
+          {highlightCards.map((item) => (
+            <article data-tilt>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <div class="included-grid" data-reveal>
+        <div>
+          <h3>Incluye</h3>
+          <ul>{tour.data.includes.map((item) => <li>{item}</li>)}</ul>
+        </div>
+        <div>
+          <h3>No incluye</h3>
+          <ul>{tour.data.excludes.map((item) => <li>{item}</li>)}</ul>
+        </div>
+      </div>
+
+      <div class="markdown-content" data-reveal>
+        <Content />
+      </div>
+
+      <section class="tour-comments" aria-labelledby="comments-tour-title" data-reveal>
+        <div class="section-heading">
+          <div>
+            <p class="section-label">COMENTARIOS</p>
+            <h2 id="comments-tour-title">Lo que podría sentirse<br /><em>en esta experiencia.</em></h2>
+          </div>
+          <p class="section-lead">Puedes reemplazar estos comentarios por testimonios reales cuando tengas tus materiales finales.</p>
+        </div>
+        <div class="tour-comments__grid">
+          {comments.slice(0, 3).map((item) => (
+            <article data-tilt>
+              <p>“{item.quote}”</p>
+              <footer>{item.name}{item.origin ? ` · ${item.origin}` : ''}</footer>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {tour.data.faq.length > 0 && (
+        <section class="tour-faq-panel" data-reveal>
+          <div>
+            <p class="section-label">PREGUNTAS FRECUENTES</p>
+            <h2>Resolvamos tus <em>dudas.</em></h2>
+          </div>
+          <div class="faq-list faq-list--panel">
+            {tour.data.faq.map((item) => (
+              <details>
+                <summary>{item.q}<span>+</span></summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section class="tour-cta-band" data-reveal>
+        <div>
+          <p class="section-label section-label--light">SIGUIENTE PASO</p>
+          <h2>¿Quieres fechas,<br /><em>cupos o disponibilidad?</em></h2>
+          <p>Escríbenos y te respondemos con orientación clara sobre esta experiencia.</p>
+        </div>
+        <a class="button button--gold" href={waLink(`Hola, quisiera consultar fechas y disponibilidad para ${tour.data.title}.`)}>Consultar disponibilidad ↗</a>
+      </section>
+    </section>
+
+    <section id="otras-rutas" class="related-tours section-wrap" data-reveal>
+      <div class="section-heading">
+        <div>
+          <p class="section-label">OTRAS EXPERIENCIAS</p>
+          <h2>También podría<br /><em>interesarte esto.</em></h2>
+        </div>
+        <a class="under-link" href="/rutas">Ver catálogo completo <span>↗</span></a>
+      </div>
+      <TourCatalog tours={relatedTours} />
+    </section>
+  </main>
+  <SiteFooter />
+</BaseLayout>

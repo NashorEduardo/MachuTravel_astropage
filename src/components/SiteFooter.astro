@@ -1,12 +1,16 @@
+---
+import { nav, site, waLink } from '../data/site';
+const social = Object.entries(site.social).filter(([, url]) => Boolean(url));
+---
 <footer class="site-footer">
-  <a class="footer-mark" href="/" aria-label="Volver al inicio">
-    <img src="/images/brand/logo-machupicchu-beyond-white.jpg" alt="" width="481" height="423" loading="lazy" />
-  </a>
-  <div class="footer-copy">
-    <p class="footer-name">MACHUPICCHU<br />BEYOND</p>
-    <p class="footer-tag">TRAVEL &amp; ADVENTURE</p>
+  <div class="footer-brand-block">
+    <a class="footer-mark" href="/" aria-label={`${site.name}, inicio`}><img src="/images/brand/logo-machupicchu-beyond-white.jpg" alt="" width="481" height="423" loading="lazy" /></a>
+    <div class="footer-copy"><p class="footer-name">MACHUPICCHU<br />BEYOND</p><p class="footer-tag">TRAVEL &amp; ADVENTURE</p></div>
   </div>
+  <nav class="footer-nav" aria-label="Navegación secundaria">{nav.map((item) => <a href={item.href}>{item.label}</a>)}<a href="/contacto">Contacto</a></nav>
+  <div class="footer-contact"><a href={waLink('Hola, quisiera información sobre Machupicchu Beyond.')}>WhatsApp · {site.phoneDisplay}</a><a href={`mailto:${site.email}`}>{site.email}</a><span>{site.city}</span>{social.map(([name, url]) => <a href={url} target="_blank" rel="noopener noreferrer">{name}</a>)}</div>
   <p class="footer-note">Herencia andina. Mirada actual. Un viaje que va más allá.</p>
-  <a class="back-top" href="/" aria-label="Volver al inicio">↑</a>
-  <small class="copyright">© {new Date().getFullYear()} Machupicchu Beyond</small>
+  <div class="footer-legal"><a href="/privacidad">Privacidad</a><a href="/terminos">Términos</a></div>
+  <a class="back-top" href="#main-content" aria-label="Volver al contenido principal">↑</a>
+  <small class="copyright">© {new Date().getFullYear()} {site.name}</small>
 </footer>

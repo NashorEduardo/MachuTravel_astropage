@@ -1,0 +1,12 @@
+{
+  "name": "Machupicchu Beyond",
+  "short_name": "Machu Beyond",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f0e6",
+  "theme_color": "#606A48",
+  "icons": [
+    { "src": "/favicon-32x32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

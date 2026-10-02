@@ -1,17 +1,42 @@
 ---
 import '../styles/global.css';
+import { absoluteUrl, site } from '../data/site';
 
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  schema?: Record<string, unknown> | Array<Record<string, unknown>>;
 }
 
 const {
   title = 'Machupicchu Beyond — Más allá de la postal',
-  description = 'Una mirada actual de aventura y descubrimiento, en conexión con la herencia andina y el territorio de Machu Picchu.',
+  description = site.description,
+  image = site.defaultImage,
+  type = 'website',
+  noindex = false,
+  schema,
 } = Astro.props;
----
 
+const canonical = absoluteUrl(Astro.url.pathname);
+const socialImage = absoluteUrl(image);
+const schemas = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url, inLanguage: 'es' },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'TravelAgency',
+    name: site.name,
+    url: site.url,
+    description: site.description,
+    email: site.email,
+    telephone: site.phoneDisplay,
+    areaServed: 'Cusco, Perú',
+  },
+  ...(schema ? (Array.isArray(schema) ? schema : [schema]) : []),
+];
+---
 <!doctype html>
 <html lang="es">
   <head>
@@ -19,20 +44,76 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#606A48" />
     <meta name="description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/images/journeys/machu-picchu-mist.jpg" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content={`${site.name} — ${title}`} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+
     <title>{title}</title>
-    <link rel="icon" type="image/jpeg" href="/images/brand/logo1.jpg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    {schemas.map((item) => <script type="application/ld+json" set:html={JSON.stringify(item)}></script>)}
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
     <slot />
+    <script is:inline>
+      (() => {
+        const initInteractive = () => {
+          const revealItems = document.querySelectorAll('[data-reveal]');
+          if ('IntersectionObserver' in window && revealItems.length) {
+            const observer = new IntersectionObserver((entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-visible');
+                  observer.unobserve(entry.target);
+                }
+              });
+            }, { threshold: 0.16, rootMargin: '0px 0px -40px 0px' });
+            revealItems.forEach((item) => observer.observe(item));
+          } else {
+            revealItems.forEach((item) => item.classList.add('is-visible'));
+          }
+
+          document.querySelectorAll('[data-tilt]').forEach((card) => {
+            const el = card;
+            el.addEventListener('mousemove', (event) => {
+              if (window.innerWidth < 900) return;
+              const rect = el.getBoundingClientRect();
+              const x = event.clientX - rect.left;
+              const y = event.clientY - rect.top;
+              const rotateX = ((y / rect.height) - 0.5) * -8;
+              const rotateY = ((x / rect.width) - 0.5) * 8;
+              el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+            });
+            el.addEventListener('mouseleave', () => {
+              el.style.transform = '';
+            });
+          });
+        };
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initInteractive, { once: true });
+        } else {
+          initInteractive();
+        }
+      })();
+    </script>
   </body>
 </html>

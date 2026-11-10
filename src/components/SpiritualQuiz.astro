@@ -1,0 +1,339 @@
+---
+import { getCollection } from 'astro:content';
+import { waLink } from '../data/site';
+
+const allTours = await getCollection('tours');
+
+// Mapeo detallado de tours para el oráculo dinámico
+const toursMap = allTours.reduce((acc, tour) => {
+  acc[tour.id] = {
+    id: tour.id,
+    title: tour.data.title,
+    subtitle: tour.data.subtitle,
+    tag: tour.data.tag,
+    kind: tour.data.kind,
+    days: tour.data.days,
+    place: tour.data.place,
+    image: tour.data.image || '/images/journeys/machu-picchu-mist.jpg',
+    summary: tour.data.summary,
+    level: tour.data.level,
+  };
+  return acc;
+}, {} as Record<string, any>);
+---
+
+<section class="quiz-section" id="oraculo-andino" aria-labelledby="quiz-heading" data-reveal>
+  <div class="section-wrap">
+    <div class="section-heading" style="text-align: center; display: block; max-width: 780px; margin: 0 auto;">
+      <div class="section-label" style="justify-content: center;">
+        <span>✦</span> ORÁCULO DEL CAMINO
+      </div>
+      <h2 id="quiz-heading" style="margin-top: 18px;">
+        Encuentra tu <em>Llamado Andino.</em>
+      </h2>
+      <p class="section-lead" style="max-width: 620px; margin: 18px auto 0;">
+        Cada viajero llega a los Andes en un momento único de su vida. Responde estas 3 preguntas y deja que la sabiduría del territorio te revele la experiencia creada para tu momento presente.
+      </p>
+    </div>
+
+    <div class="quiz-container" data-tours={JSON.stringify(toursMap)}>
+      <!-- Barra de progreso -->
+      <div class="quiz-progress-bar" aria-label="Progreso del oráculo">
+        <div class="quiz-progress-step is-active" data-step="1"></div>
+        <div class="quiz-progress-step" data-step="2"></div>
+        <div class="quiz-progress-step" data-step="3"></div>
+      </div>
+
+      <!-- PASO 1 -->
+      <div class="quiz-step-panel is-current" data-step="1">
+        <div class="quiz-step-number">PASO 01 / 03 · TU INTENCIÓN</div>
+        <h3 class="quiz-step-title">¿Cuál es el anhelo principal de tu espíritu hoy?</h3>
+        <div class="quiz-options-grid">
+          <button class="quiz-option-btn" type="button" data-val="healing">
+            <span class="quiz-option-icon" aria-hidden="true">🌱</span>
+            <div class="quiz-option-content">
+              <b>Sanación y Renacimiento</b>
+              <p>Soltar cargas antiguas, conectar con la medicina natural y encontrar paz profunda.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="gratitude">
+            <span class="quiz-option-icon" aria-hidden="true">🌸</span>
+            <div class="quiz-option-content">
+              <b>Agradecer a la Pachamama</b>
+              <p>Ofrendar en reciprocidad (Ayni), armonizar mis energías y honrar la Madre Tierra.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="mountain">
+            <span class="quiz-option-icon" aria-hidden="true">🏔️</span>
+            <div class="quiz-option-content">
+              <b>Reto Físico y Silencio de Montaña</b>
+              <p>Caminar senderos sagrados de gran altitud, lagos glaciares y templanza interior.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="wisdom">
+            <span class="quiz-option-icon" aria-hidden="true">📜</span>
+            <div class="quiz-option-content">
+              <b>Iniciación y Linaje Q'ero</b>
+              <p>Aprender directamente de los maestros Paqos, recibir ritos Karpay y sabiduría viva.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- PASO 2 -->
+      <div class="quiz-step-panel" data-step="2">
+        <div class="quiz-step-number">PASO 02 / 03 · TU RITMO</div>
+        <h3 class="quiz-step-title">¿Qué ritmo de viaje resuena con tu cuerpo?</h3>
+        <div class="quiz-options-grid">
+          <button class="quiz-option-btn" type="button" data-val="soft">
+            <span class="quiz-option-icon" aria-hidden="true">🌿</span>
+            <div class="quiz-option-content">
+              <b>Pausado y Contemplativo</b>
+              <p>Tiempos lentos, valles cálidos, descanso consciente y poca exigencia física.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="balanced">
+            <span class="quiz-option-icon" aria-hidden="true">☀️</span>
+            <div class="quiz-option-content">
+              <b>Equilibrado con Caminata Mágica</b>
+              <p>Subidas escalonadas, santuarios míticos, amaneceres luminosos y ritmo armónico.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="demanding">
+            <span class="quiz-option-icon" aria-hidden="true">🦅</span>
+            <div class="quiz-option-content">
+              <b>Exigente y Transformador</b>
+              <p>Pasos de altura sobre los 4,500m, campamentos bajo estrellas y superación personal.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="introspective">
+            <span class="quiz-option-icon" aria-hidden="true">🕯️</span>
+            <div class="quiz-option-content">
+              <b>Inmersión Interior Nocturna</b>
+              <p>Trabajo ceremonioso profundo, círculos de palabra, silencio y quietud prolongada.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="quiz-step-panel" data-step="3">
+        <div class="quiz-step-number">PASO 03 / 03 · ELEMENTO SAGRADO</div>
+        <h3 class="quiz-step-title">¿Qué fuerza natural llama a tu corazón?</h3>
+        <div class="quiz-options-grid">
+          <button class="quiz-option-btn" type="button" data-val="inti">
+            <span class="quiz-option-icon" aria-hidden="true">✨</span>
+            <div class="quiz-option-content">
+              <b>El Inti (El Sol y la Primera Luz)</b>
+              <p>Recibir el rayo solar en templos milenarios para alumbrar un nuevo comienzo.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="pachamama">
+            <span class="quiz-option-icon" aria-hidden="true">🍂</span>
+            <div class="quiz-option-content">
+              <b>La Pachamama (Tierra Fértil y Flores)</b>
+              <p>Sentir la nutrición del suelo andino, semillas sagradas y humo de copal bendito.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="apus">
+            <span class="quiz-option-icon" aria-hidden="true">🗻</span>
+            <div class="quiz-option-content">
+              <b>Los Apus (Espíritus de Nieve Eterna)</b>
+              <p>La fuerza protectora de los colosos que custodian el valle desde las alturas.</p>
+            </div>
+          </button>
+
+          <button class="quiz-option-btn" type="button" data-val="selva">
+            <span class="quiz-option-icon" aria-hidden="true">🍃</span>
+            <div class="quiz-option-content">
+              <b>La Selva Alta (Ríos y Medicina Verde)</b>
+              <p>El murmullo de cascadas, la vegetación exuberante y el misterio sanador vegetal.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL DE RESULTADO -->
+      <div class="quiz-result-panel" data-step="result">
+        <div class="quiz-step-number" style="color: var(--inti-deep);">✦ TU LLAMADO ANDINO HA SIDO REVELADO</div>
+        <h3 class="quiz-step-title" style="margin-bottom: 8px;">El camino que resuena con tu energía</h3>
+        <p style="color: #636154; font-size: 13px; margin: 0 0 20px;">
+          Basado en tu búsqueda de hoy, esta es la experiencia sagrada recomendada para tu transformación:
+        </p>
+
+        <div class="quiz-result-card">
+          <div class="quiz-result-image">
+            <img class="result-img" src="/images/journeys/machu-picchu-mist.jpg" alt="" />
+          </div>
+          <div class="quiz-result-content">
+            <span class="result-badge">INICIACIÓN ANCESTRAL</span>
+            <h4 class="result-title" style="margin: 0 0 8px; font-size: 24px; color: #fff;">Título de la Ruta</h4>
+            <div class="result-meta" style="font-size: 11px; color: var(--inti); margin-bottom: 12px; letter-spacing: 0.1em; text-transform: uppercase;">
+              <span class="result-days">5 días / 4 noches</span> · <span class="result-place">Cusco</span>
+            </div>
+            <p class="result-summary">Resumen del viaje</p>
+            
+            <div class="quiz-result-actions">
+              <a class="button button--gold result-link" href="/rutas">
+                Explorar esta ruta <span>↗</span>
+              </a>
+              <a class="button button--dark result-wa" target="_blank" rel="noopener noreferrer" href="#">
+                Hablar con un Guía <span>💬</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <button class="quiz-reset-btn" type="button">
+          <span aria-hidden="true">↺</span> Consultar con otra intención
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (() => {
+    const initQuiz = () => {
+      const container = document.querySelector('.quiz-container');
+      if (!container) return;
+
+      const toursData = JSON.parse(container.getAttribute('data-tours') || '{}');
+      const stepPanels = container.querySelectorAll('.quiz-step-panel');
+      const resultPanel = container.querySelector('.quiz-result-panel');
+      const progressSteps = container.querySelectorAll('.quiz-progress-step');
+      const resetBtn = container.querySelector('.quiz-reset-btn');
+
+      const userAnswers = {
+        intention: null,
+        rhythm: null,
+        element: null,
+      };
+
+      const setStep = (stepNumber) => {
+        stepPanels.forEach((panel) => {
+          if (panel.getAttribute('data-step') === String(stepNumber)) {
+            panel.classList.add('is-current');
+          } else {
+            panel.classList.remove('is-current');
+          }
+        });
+
+        if (stepNumber === 'result') {
+          resultPanel?.classList.add('is-current');
+        } else {
+          resultPanel?.classList.remove('is-current');
+        }
+
+        progressSteps.forEach((pStep) => {
+          const s = parseInt(pStep.getAttribute('data-step') || '1', 10);
+          if (stepNumber === 'result' || s <= stepNumber) {
+            pStep.classList.add('is-active');
+          } else {
+            pStep.classList.remove('is-active');
+          }
+        });
+      };
+
+      const determineTour = () => {
+        const { intention, rhythm, element } = userAnswers;
+        
+        // Reglas de coincidencia armónicas
+        if (intention === 'wisdom' || rhythm === 'demanding' && element === 'pachamama') {
+          return toursData['camino-qero'] || Object.values(toursData)[0];
+        }
+        if (intention === 'healing' || element === 'selva' || rhythm === 'introspective') {
+          return toursData['retiro-ceja-de-selva'] || toursData['despacho-pachamama'] || Object.values(toursData)[0];
+        }
+        if (intention === 'mountain' || element === 'apus' || rhythm === 'demanding') {
+          return toursData['peregrinacion-ausangate'] || toursData['santuario-waqrapukara'] || Object.values(toursData)[0];
+        }
+        if (intention === 'gratitude' || element === 'pachamama' || rhythm === 'soft') {
+          return toursData['despacho-pachamama'] || Object.values(toursData)[0];
+        }
+        if (element === 'inti' || rhythm === 'balanced') {
+          return toursData['despertar-solar'] || Object.values(toursData)[0];
+        }
+        return toursData['santuario-waqrapukara'] || Object.values(toursData)[0];
+      };
+
+      const showResult = () => {
+        const selectedTour = determineTour();
+        if (!selectedTour) return;
+
+        const imgEl = resultPanel?.querySelector('.result-img');
+        const badgeEl = resultPanel?.querySelector('.result-badge');
+        const titleEl = resultPanel?.querySelector('.result-title');
+        const daysEl = resultPanel?.querySelector('.result-days');
+        const placeEl = resultPanel?.querySelector('.result-place');
+        const summaryEl = resultPanel?.querySelector('.result-summary');
+        const linkEl = resultPanel?.querySelector('.result-link');
+        const waEl = resultPanel?.querySelector('.result-wa');
+
+        if (imgEl) imgEl.src = selectedTour.image;
+        if (badgeEl) badgeEl.textContent = `${selectedTour.tag} · ${selectedTour.kind}`;
+        if (titleEl) titleEl.textContent = selectedTour.title;
+        if (daysEl) daysEl.textContent = selectedTour.days;
+        if (placeEl) placeEl.textContent = selectedTour.place;
+        if (summaryEl) summaryEl.textContent = selectedTour.summary;
+        if (linkEl) linkEl.href = `/rutas/${selectedTour.id}`;
+        
+        if (waEl) {
+          const msg = `Hola, completé el oráculo en la web de Machupicchu Beyond. Mi llamado andino es: "${selectedTour.title}". Quisiera consultar disponibilidad y fechas para mi viaje.`;
+          waEl.href = `https://wa.me/51943491959?text=${encodeURIComponent(msg)}`;
+        }
+
+        setStep('result');
+      };
+
+      // Listeners de botones de opciones
+      stepPanels.forEach((panel) => {
+        const currentStep = parseInt(panel.getAttribute('data-step') || '1', 10);
+        const buttons = panel.querySelectorAll('.quiz-option-btn');
+
+        buttons.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            buttons.forEach((b) => b.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+
+            const val = btn.getAttribute('data-val');
+            if (currentStep === 1) userAnswers.intention = val;
+            if (currentStep === 2) userAnswers.rhythm = val;
+            if (currentStep === 3) userAnswers.element = val;
+
+            setTimeout(() => {
+              if (currentStep < 3) {
+                setStep(currentStep + 1);
+              } else {
+                showResult();
+              }
+            }, 250);
+          });
+        });
+      });
+
+      resetBtn?.addEventListener('click', () => {
+        userAnswers.intention = null;
+        userAnswers.rhythm = null;
+        userAnswers.element = null;
+        container.querySelectorAll('.quiz-option-btn').forEach((b) => b.classList.remove('is-selected'));
+        setStep(1);
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initQuiz, { once: true });
+    } else {
+      initQuiz();
+    }
+    document.addEventListener('astro:page-load', initQuiz);
+  })();
+</script>

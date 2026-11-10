@@ -1,5 +1,42 @@
 ---
-import { getCollection } from 'astro:content'; import BaseLayout from '../../layouts/BaseLayout.astro'; import SiteHeader from '../../components/SiteHeader.astro'; import SiteFooter from '../../components/SiteFooter.astro';
-const posts = (await getCollection('blog')).sort((a,b) => b.data.date.localeCompare(a.data.date));
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.localeCompare(a.data.date));
 ---
-<BaseLayout title="Diario | Machupicchu Beyond"><SiteHeader /><main id="main-content"><section class="page-hero"><p class="section-label">NOTAS DESDE EL CAMINO</p><h1>Cuaderno de<br /><em>viaje.</em></h1><p>Ideas, historias y preguntas para acercarse al territorio andino.</p></section><section class="journal-grid section-wrap">{posts.map((post) => <article class="journal-card"><span>{post.data.place} · {post.data.date}</span><h2><a href={`/diario/${post.id}`}>{post.data.title}</a></h2><p>{post.data.excerpt}</p><a class="under-link" href={`/diario/${post.id}`}>Leer artículo ↗</a></article>)}</section></main><SiteFooter /></BaseLayout>
+
+<BaseLayout
+  title="Diario del Camino & Sabiduría Andina | Machupicchu Beyond"
+  description="Ensayos, notas de viaje y reflexiones sobre el Despacho, los Apus sagrados y la cosmovisión inca en Cusco."
+>
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs items={[{ label: 'Inicio', href: '/' }, { label: 'Diario del Camino' }]} />
+      </div>
+      <p class="section-label"><span>✦</span> NOTAS DESDE EL TERRITORIO</p>
+      <h1>Cuaderno de<br /><em>viaje y memoria.</em></h1>
+      <p>Ideas, relatos y preguntas para acercarse al territorio andino con profundidad y respeto.</p>
+    </section>
+
+    <section class="section-wrap" style="padding-block: 60px 110px;">
+      <div class="journal-grid">
+        {posts.map((post) => (
+          <article class="journal-card glass-glow-card" data-tilt>
+            <span>{post.data.place} · {new Date(post.data.date).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <h2><a href={`/diario/${post.id}`}>{post.data.title}</a></h2>
+            <p>{post.data.excerpt}</p>
+            <a class="under-link" href={`/diario/${post.id}`}>Leer artículo <span>↗</span></a>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

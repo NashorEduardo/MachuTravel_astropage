@@ -1,0 +1,137 @@
+---
+interface ItineraryDay {
+  day: string;
+  title: string;
+  text: string;
+}
+
+interface Props {
+  itinerary: ItineraryDay[];
+  tourKind?: string;
+  place?: string;
+  tourTitle?: string;
+}
+
+const { itinerary, tourKind = 'peregrinacion', place = 'Cusco', tourTitle = '' } = Astro.props;
+
+// Mapeos espirituales inteligentes según el texto y contexto de cada día
+function getSpiritualData(day: ItineraryDay, index: number, total: number, placeStr: string) {
+  const textLower = (day.title + ' ' + day.text).toLowerCase();
+  
+  // Altitud estimada
+  let altitude = '3,400 msnm';
+  if (textLower.includes('valle') || textLower.includes('ollantaytambo') || textLower.includes('urubamba')) altitude = '2,870 msnm';
+  else if (textLower.includes('machu picchu') || textLower.includes('aguas calientes')) altitude = '2,430 msnm';
+  else if (textLower.includes('selva') || textLower.includes('albergue')) altitude = '1,650 msnm';
+  else if (textLower.includes('ausangate') || textLower.includes('campamento') || textLower.includes('q\'ero') || textLower.includes('waqrapukara')) altitude = '4,200 msnm - 4,750 msnm';
+  else if (index === 0) altitude = '3,400 msnm (Cusco)';
+
+  // Propósito Espiritual
+  let purpose = 'Conexión con el territorio y pausa interior';
+  if (index === 0) purpose = 'Apertura del espacio sagrado y siembra de intención';
+  else if (index === total - 1) purpose = 'Integración del viaje y retorno en gratitud';
+  else if (textLower.includes('despacho') || textLower.includes('ofrenda')) purpose = 'Reciprocidad sagrada con la Pachamama (Ayni)';
+  else if (textLower.includes('karpay') || textLower.includes('rito') || textLower.includes('paqo')) purpose = 'Iniciación energética y bendición de los maestros';
+  else if (textLower.includes('amanecer') || textLower.includes('solar')) purpose = 'Recepción de la primera luz y claridad de visión';
+  else if (textLower.includes('caminata') || textLower.includes('montaña')) purpose = 'Trascendencia en el silencio de los Apus';
+  else if (textLower.includes('nocturna') || textLower.includes('medicina')) purpose = 'Sanación profunda y renovación del espíritu';
+
+  // Nivel de energía
+  let energyLevel = 'Introspección Serena';
+  if (textLower.includes('alta') || textLower.includes('exigente') || textLower.includes('subida')) energyLevel = 'Fuerza & Elevación';
+  else if (textLower.includes('rito') || textLower.includes('despacho') || textLower.includes('ceremonia')) energyLevel = 'Vórtice Ceremonial';
+  else if (index === total - 1) energyLevel = 'Paz & Anclaje';
+
+  // Ceremonias / Rituales detectados
+  const ceremonies: string[] = [];
+  if (textLower.includes('coca') || index === 0) ceremonies.push('Kintu de Coca Sagrada');
+  if (textLower.includes('despacho') || textLower.includes('ofrenda')) ceremonies.push('Ofrenda a la Pachamama');
+  if (textLower.includes('karpay')) ceremonies.push('Rito de Karpay Ancestral');
+  if (textLower.includes('amanecer') || textLower.includes('solar')) ceremonies.push('Salutación al Inti');
+  if (textLower.includes('círculo') || textLower.includes('palabra')) ceremonies.push('Círculo de Integración');
+
+  return { altitude, purpose, energyLevel, ceremonies };
+}
+---
+
+<section class="timeline-section" aria-labelledby="timeline-heading">
+  <div class="section-wrap">
+    <div class="section-heading" data-reveal>
+      <div>
+        <div class="section-label">
+          <span>✦</span> EL SENDERO SAGRADO
+        </div>
+        <h2 id="timeline-heading">
+          Itinerario vivencial<br />
+          <em>paso a paso.</em>
+        </h2>
+      </div>
+      <p class="section-lead">
+        Cada jornada está estructurada como un rito de paso: tiempo para aclimatar el cuerpo, abrir el corazón y asimilar la enseñanza del territorio.
+      </p>
+    </div>
+
+    <div class="timeline-wrapper">
+      <div class="timeline-axis" aria-hidden="true"></div>
+
+      {itinerary.map((step, idx) => {
+        const meta = getSpiritualData(step, idx, itinerary.length, place);
+        const dayNumber = idx + 1;
+        return (
+          <article class:list={["timeline-node", idx === 0 ? "is-active" : ""]} data-reveal data-timeline-node>
+            <div class="timeline-marker" aria-hidden="true">
+              <span>DÍA</span>
+              <b>{dayNumber < 10 ? `0${dayNumber}` : dayNumber}</b>
+            </div>
+
+            <div class="timeline-card glass-glow-card">
+              <div class="timeline-meta">
+                <span class="timeline-pill">🏔️ {meta.altitude}</span>
+                <span class="timeline-pill">⚡ {meta.energyLevel}</span>
+                {meta.ceremonies.map((ceremony) => (
+                  <span class="timeline-pill timeline-pill--ceremony">✦ {ceremony}</span>
+                ))}
+              </div>
+
+              <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--machu); margin-bottom: 6px;">
+                PROPÓSITO ESPIRITUAL: <span style="color: var(--inti-deep);">{meta.purpose}</span>
+              </div>
+
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (() => {
+    const initTimeline = () => {
+      const nodes = document.querySelectorAll('[data-timeline-node]');
+      if (!nodes.length || !('IntersectionObserver' in window)) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-active');
+          }
+        });
+      }, {
+        threshold: 0.35,
+        rootMargin: '-40px 0px -40px 0px'
+      });
+
+      nodes.forEach((node) => observer.observe(node));
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTimeline, { once: true });
+    } else {
+      initTimeline();
+    }
+    document.addEventListener('astro:page-load', initTimeline);
+  })();
+</script>

@@ -5,7 +5,44 @@ import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import TourCatalog from '../../components/TourCatalog.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-const tours = (await getCollection('tours')).sort((a,b) => a.data.order-b.data.order);
+
+const tours = (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
 ---
-<BaseLayout title="Rutas y experiencias en Cusco | Machupicchu Beyond" description="Explora peregrinaciones, ceremonias y rutas de iniciación en Cusco y los Andes, en grupos pequeños.">
-<SiteHeader /><main id="main-content"><section class="page-hero"><Breadcrumbs items={[{label:'Inicio',href:'/'},{label:'Rutas'}]} /><p class="section-label">CUSCO · PERÚ / NUESTRAS EXPERIENCIAS</p><h1>Caminos que invitan<br />a ir <em>más allá.</em></h1><p>Encuentra la ruta que conecta con tu forma de explorar.</p></section><section class="catalog section-wrap"><nav class="filters" aria-label="Filtrar rutas"><a class="is-active" href="/rutas">Todas las rutas</a><a href="/rutas/ceremonias">Ceremonias</a><a href="/rutas/peregrinaciones">Peregrinaciones</a><a href="/rutas/iniciacion">Iniciación</a></nav><TourCatalog tours={tours} /></section></main><SiteFooter /></BaseLayout>
+
+<BaseLayout
+  title="Rutas Sagradas y Experiencias en Cusco | Machupicchu Beyond"
+  description="Explora peregrinaciones sagradas a los Apus, ceremonias de Despacho y rutas de iniciación ancestral en Cusco y los Andes en grupos de 4 a 8 personas."
+>
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs items={[{ label: 'Inicio', href: '/' }, { label: 'Rutas' }]} />
+      </div>
+      <p class="section-label">
+        <span>✦</span> CUSCO · PERÚ / EXPERIENCIAS SACRAS
+      </p>
+      <h1>
+        Caminos que van<br />
+        <em>más allá de la postal.</em>
+      </h1>
+      <p>
+        Cada travesía es una invitación a sintonizar con la geografía sagrada de los Andes. Selecciona el sendero que resuene con el momento de tu vida.
+      </p>
+    </section>
+
+    <section class="catalog section-wrap">
+      <nav class="filters" aria-label="Filtrar rutas">
+        <a class="is-active" href="/rutas">Todas las rutas</a>
+        <a href="/rutas/ceremonias">Ceremonias</a>
+        <a href="/rutas/peregrinaciones">Peregrinaciones</a>
+        <a href="/rutas/iniciacion">Iniciación</a>
+      </nav>
+
+      <TourCatalog tours={tours} />
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

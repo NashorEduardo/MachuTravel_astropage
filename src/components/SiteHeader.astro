@@ -5,33 +5,54 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 
 <header class="site-header">
   <a class="brand-lockup" href="/" aria-label={`${site.name}, inicio`}>
-    <img src="/images/brand/logo-machupicchu-beyond-color.jpg" alt="Machupicchu Beyond" width="526" height="206" />
+    <img src="/images/brand/logo-machupicchu-beyond-color.jpg" alt="Machupicchu Beyond" width="526" height="206" fetchpriority="high" />
   </a>
-  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">
-    <span>Menú</span><span class="menu-glyph" aria-hidden="true"><i></i><i></i></span>
+  
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú de navegación">
+    <span>Menú</span>
+    <span class="menu-glyph" aria-hidden="true"><i></i><i></i></span>
   </button>
+
   <nav class="primary-nav" id="primary-navigation" aria-label="Navegación principal">
     {nav.map((item) => (
       <a class:list={[path === item.href || path.startsWith(`${item.href}/`) ? 'is-active' : '']} href={item.href}>
         {item.label}
       </a>
     ))}
-    <a class="nav-cta" href="/contacto">Escríbenos <span aria-hidden="true">↗</span></a>
+    <a class="nav-cta" href="/contacto">
+      Concierge <span aria-hidden="true">✦</span>
+    </a>
   </nav>
 </header>
 
-<script>
-  const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle');
-  const navigation = document.querySelector<HTMLElement>('.primary-nav');
-  menuButton?.addEventListener('click', () => {
-    const open = menuButton.getAttribute('aria-expanded') === 'true';
-    menuButton.setAttribute('aria-expanded', String(!open));
-    navigation?.classList.toggle('is-open', !open);
-  });
-  navigation?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      menuButton?.setAttribute('aria-expanded', 'false');
-      navigation?.classList.remove('is-open');
-    });
-  });
+<script is:inline>
+  (() => {
+    const initMenu = () => {
+      const menuButton = document.querySelector('.menu-toggle');
+      const navigation = document.querySelector('.primary-nav');
+      if (!menuButton || !navigation) return;
+
+      const toggleMenu = () => {
+        const open = menuButton.getAttribute('aria-expanded') === 'true';
+        menuButton.setAttribute('aria-expanded', String(!open));
+        navigation.classList.toggle('is-open', !open);
+      };
+
+      menuButton.onclick = toggleMenu;
+
+      navigation.querySelectorAll('a').forEach((link) => {
+        link.onclick = () => {
+          menuButton.setAttribute('aria-expanded', 'false');
+          navigation.classList.remove('is-open');
+        };
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMenu, { once: true });
+    } else {
+      initMenu();
+    }
+    document.addEventListener('astro:page-load', initMenu);
+  })();
 </script>

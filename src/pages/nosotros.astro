@@ -1,4 +1,85 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'; import SiteHeader from '../components/SiteHeader.astro'; import SiteFooter from '../components/SiteFooter.astro'; import { philosophy, team } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { philosophy, team, waLink } from '../data/site';
 ---
-<BaseLayout title="Nosotros | Machupicchu Beyond"><SiteHeader /><main id="main-content"><section class="page-hero"><p class="section-label">NUESTRA MIRADA · CUSCO</p><h1>Más allá de la<br /><em>postal.</em></h1><p>Machupicchu Beyond conecta la herencia andina con una mirada actual de aventura y descubrimiento.</p></section><section class="about-grid section-wrap"><div><p class="section-label">UNA FORMA DE VIAJAR</p><h2>Territorio vivo,<br />encuentros <em>reales.</em></h2></div><p>Creemos que el viaje empieza con curiosidad y continúa con respeto. Diseñamos rutas para explorar el paisaje, la memoria y la cultura de Cusco sin reducirlos a un escenario.</p></section><section class="value-grid section-wrap">{philosophy.map((item) => <article><span>{item.number} / MACHUPICCHU BEYOND</span><h3>{item.title}</h3><p>{item.desc}</p></article>)}</section><section class="team section-wrap"><p class="section-label">QUIÉNES ACOMPAÑAN EL CAMINO</p><h2>Una red local<br />para cada <em>ruta.</em></h2><div class="team-grid">{team.map((item) => <article><h3>{item.role}</h3><p>{item.text}</p></article>)}</div></section></main><SiteFooter /></BaseLayout>
+
+<BaseLayout
+  title="Nuestra Cosmovisión y Mirada | Machupicchu Beyond"
+  description="Conoce la filosofía de Machupicchu Beyond: turismo sagrado, respeto por las comunidades locales y acompañamiento de guías y maestros en Cusco."
+>
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs items={[{ label: 'Inicio', href: '/' }, { label: 'Nosotros' }]} />
+      </div>
+      <p class="section-label"><span>✦</span> NUESTRA MIRADA · CUSCO SACRO</p>
+      <h1>
+        Más allá de la postal.<br />
+        <em>Hacia el origen.</em>
+      </h1>
+      <p>
+        Machupicchu Beyond nace para ofrecer una alternativa honesta al turismo masivo: viajes en grupos íntimos donde el territorio andino se experimenta como un templo vivo de memoria y transformación.
+      </p>
+    </section>
+
+    <section class="about-grid section-wrap" data-reveal>
+      <div>
+        <p class="section-label"><span>✦</span> UNA FORMA DE CAMINAR</p>
+        <h2>Territorio sagrado,<br />encuentros <em>humanos.</em></h2>
+      </div>
+      <p>
+        Creemos que el viaje auténtico comienza con la humildad y madura en el silencio. Diseñamos cada experiencia para dialogar con los Apus, honrar a la Pachamama y respaldar a los guardianes culturales de cada comunidad sin intermediarios extractivos.
+      </p>
+    </section>
+
+    <!-- FILOSOFÍA -->
+    <section class="section-wrap" style="padding-bottom: 70px;" data-reveal>
+      <div class="value-grid">
+        {philosophy.map((item) => (
+          <article data-tilt>
+            <span>{item.number} / MACHUPICCHU BEYOND</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- EQUIPO Y RED LOCAL -->
+    <section class="team section-wrap" data-reveal style="border-top: 1px solid #dedbce; padding-top: 80px;">
+      <p class="section-label"><span>✦</span> ACOMPAÑAMIENTO CONCIERGE</p>
+      <h2>Una red sagrada<br />para cada <em>experiencia.</em></h2>
+      <div class="team-grid" style="margin-top: 40px;">
+        {team.map((item) => (
+          <article data-tilt>
+            <h3>{item.role}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <div class="section-wrap" style="padding-bottom: 110px;">
+      <section class="tour-cta-band" data-reveal>
+        <div>
+          <p class="section-label section-label--light"><span>✦</span> CONVERSEMOS</p>
+          <h2>¿Quieres conversar con nuestro<br /><em>equipo en Cusco?</em></h2>
+          <p>
+            Estamos a tu disposición para diseñar un itinerario a la medida de tu grupo o coordinar un viaje en solitario.
+          </p>
+        </div>
+        <a class="button button--gold" href={waLink('Hola, leí su página de Nosotros y quisiera conversar sobre organizar un viaje sagrado a Cusco.')} target="_blank" rel="noopener noreferrer">
+          Hablar por WhatsApp <span>💬</span>
+        </a>
+      </section>
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

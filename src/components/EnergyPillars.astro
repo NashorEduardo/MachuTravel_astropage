@@ -1,0 +1,120 @@
+---
+interface Props {
+  title?: string;
+  subtitle?: string;
+  showIntro?: boolean;
+}
+
+const {
+  title = "Pilares de la Cosmovisión Sagrada",
+  subtitle = "SABIDURÍA ANDINA & ENERGÍA ANCESTRAL",
+  showIntro = true,
+} = Astro.props;
+
+const pillars = [
+  {
+    number: "01",
+    tag: "SOL & CONCIENCIA",
+    title: "Inti",
+    concept: "La Fuerza Vital (Kawsay)",
+    description: "Para los Incas, el Inti no es un astro distante sino el padre cósmico que despierta la energía vital en cada ser. En nuestras rutas al alba, recibir los primeros rayos dorados sobre Machu Picchu o el Valle Sagrado se convierte en una experiencia de reconexión y renacer espiritual.",
+    ritual: "Apertura solar y meditación en portales pétreos",
+    icon: "sun",
+  },
+  {
+    number: "02",
+    tag: "MADRE TIERRA & GRATITUD",
+    title: "Pachamama",
+    concept: "La Ofrenda del Despacho",
+    description: "La Pachamama nos sostiene, nos nutre y acoge nuestras intenciones. A través del sagrado 'Despacho' (Haywarikuy), guiado por un maestro local, depositamos flores, semillas, dulces y el kintu de coca para devolver amor y equilibrio a la tierra que pisamos.",
+    ritual: "Ceremonia de Despacho y siembra de intenciones",
+    icon: "earth",
+  },
+  {
+    number: "03",
+    tag: "GUARDIANES DE PIEDRA",
+    title: "Apus Sagrados",
+    concept: "Montañas de Silencio y Poder",
+    description: "Ausangate, Salkantay y Waqrapukara son templos vivientes. En las peregrinaciones de altura, el caminante aprende a pedir permiso a cada paso, a acompasar el latido del corazón con el viento y a encontrar respuestas en la quietud de los lagos turquesas.",
+    ritual: "Pago y saludo a las cumbres en pasos de montaña",
+    icon: "mountain",
+  },
+  {
+    number: "04",
+    tag: "RECIPROCIDAD & LINAJE",
+    title: "Ayni & Paqos Q'ero",
+    concept: "El Principio Cósmico del Ayni",
+    description: "«Hoy por ti, mañana por mí». En Machupicchu Beyond honramos a las comunidades Q'ero, últimos guardianes directos del conocimiento inca. No comercializamos el rito: colaboramos desde el respeto, la justa retribución y la reverencia por su autoridad ancestral.",
+    ritual: "Iniciaciones Karpay y convivencia comunitaria",
+    icon: "infinity",
+  },
+];
+---
+
+<section class="pillars-section" aria-labelledby="pillars-heading" data-reveal>
+  <div class="section-wrap">
+    {showIntro && (
+      <div class="section-heading">
+        <div>
+          <div class="section-label section-label--light">
+            <span>✦</span> {subtitle}
+          </div>
+          <h2 id="pillars-heading">
+            El territorio es un templo.<br />
+            <em>La energía, nuestro guía.</em>
+          </h2>
+        </div>
+        <p class="section-lead" style="color: rgba(255,255,255,0.78);">
+          Cada experiencia que diseñamos está enraizada en los principios cósmicos que sustentaron el Tawantinsuyu durante siglos. No somos turistas; somos peregrinos con intención.
+        </p>
+      </div>
+    )}
+
+    <div class="pillars-grid">
+      {pillars.map((pillar) => (
+        <article class="pillar-card glass-glow-card" data-tilt>
+          <div class="pillar-glyph" aria-hidden="true">
+            {pillar.icon === 'sun' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="m17.66 17.66 1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.34 17.66-1.41 1.41"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+              </svg>
+            )}
+            {pillar.icon === 'earth' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path>
+                <path d="M12 6a6 6 0 0 0-6 6c0 2.5 1.8 4.6 4.2 5.6"></path>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+            )}
+            {pillar.icon === 'mountain' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+                <path d="M4.14 15h15.72"></path>
+              </svg>
+            )}
+            {pillar.icon === 'infinity' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"></path>
+              </svg>
+            )}
+          </div>
+          <span class="pillar-tag">{pillar.tag}</span>
+          <h3>{pillar.title}</h3>
+          <p>{pillar.description}</p>
+          <div class="pillar-footer">
+            <span>✦ {pillar.concept}</span>
+            <small>{pillar.number}</small>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

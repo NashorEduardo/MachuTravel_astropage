@@ -1,0 +1,235 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site, waLink } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.bookingPage.heroTitle} ${t.bookingPage.heroTitleEm} | Machupicchu Beyond`}
+  description={t.bookingPage.heroDesc}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.booking },
+          ]}
+        />
+      </div>
+      <p class="section-label"><span>✦</span> {t.bookingPage.heroKicker}</p>
+      <h1>
+        {t.bookingPage.heroTitle}<br />
+        <em>{t.bookingPage.heroTitleEm}</em>
+      </h1>
+      <p>
+        {t.bookingPage.heroDesc}
+      </p>
+    </section>
+
+    <!-- PASOS DEL PROCESO -->
+    <section class="section-wrap" style="padding-block: 60px 40px;" data-reveal>
+      <div class="booking-steps-grid">
+        <article class="step-card glass-glow-card" data-tilt>
+          <span class="step-badge">Paso 01</span>
+          <h3>{t.bookingPage.step1Title}</h3>
+          <p>{t.bookingPage.step1Desc}</p>
+        </article>
+        <article class="step-card glass-glow-card" data-tilt>
+          <span class="step-badge">Paso 02</span>
+          <h3>{t.bookingPage.step2Title}</h3>
+          <p>{t.bookingPage.step2Desc}</p>
+        </article>
+        <article class="step-card glass-glow-card" data-tilt>
+          <span class="step-badge">Paso 03</span>
+          <h3>{t.bookingPage.step3Title}</h3>
+          <p>{t.bookingPage.step3Desc}</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- POLÍTICAS COMERCIALES CON PLACEHOLDERS PARA EL CLIENTE -->
+    <section class="section-wrap" style="padding-bottom: 90px;" data-reveal>
+      <div class="booking-policy-grid">
+        <article class="policy-card">
+          <div class="policy-card-header">
+            <span class="policy-icon" aria-hidden="true">💳</span>
+            <h3>{t.bookingPage.paymentMethodsTitle}</h3>
+          </div>
+          <p>
+            Aceptamos transferencias bancarias en moneda nacional (PEN) y dólares (USD), tarjetas de crédito/débito y pasarelas de pago digitales seguras.
+          </p>
+          <div class="policy-todo-box">
+            <b>TODO(cliente):</b> Confirmar pasarelas exactas (ej. Niubiz, Stripe, PayPal) y posibles comisiones por transacción interbancaria.
+          </div>
+        </article>
+
+        <article class="policy-card">
+          <div class="policy-card-header">
+            <span class="policy-icon" aria-hidden="true">📅</span>
+            <h3>Adelanto de Reserva y Saldo</h3>
+          </div>
+          <p>
+            Para asegurar permisos oficiales de ingreso (ej. Camino Inca o Machu Picchu) y reservar guías de montaña, se requiere un porcentaje de adelanto formal. El saldo restante se cancela antes del inicio de la ruta.
+          </p>
+          <div class="policy-todo-box">
+            <b>TODO(cliente):</b> Definir porcentaje de adelanto formal (ej. 30%, 50%) y plazo límite para liquidar el saldo final en Cusco.
+          </div>
+        </article>
+
+        <article class="policy-card">
+          <div class="policy-card-header">
+            <span class="policy-icon" aria-hidden="true">🔄</span>
+            <h3>{t.bookingPage.cancellationTitle}</h3>
+          </div>
+          <p>
+            {t.bookingPage.cancellationDesc}
+          </p>
+          <div class="policy-todo-box">
+            <b>TODO(cliente):</b> Detallar plazos en días y porcentajes de devolución aplicables según la anticipación de la anulación escrita.
+          </div>
+        </article>
+
+        <article class="policy-card">
+          <div class="policy-card-header">
+            <span class="policy-icon" aria-hidden="true">📆</span>
+            <h3>{t.bookingPage.reschedulingTitle}</h3>
+          </div>
+          <p>
+            {t.bookingPage.reschedulingDesc}
+          </p>
+          <div class="policy-todo-box">
+            <b>TODO(cliente):</b> Especificar costos administrativos por reprogramación de fechas y plazos mínimos de preaviso.
+          </div>
+        </article>
+
+        <article class="policy-card">
+          <div class="policy-card-header">
+            <span class="policy-icon" aria-hidden="true">🌦️</span>
+            <h3>{t.bookingPage.weatherTitle}</h3>
+          </div>
+          <p>
+            {t.bookingPage.weatherDesc}
+          </p>
+          <div class="policy-todo-box">
+            <b>TODO(cliente):</b> Ratificar protocolo de compensación o reubicación en caso de cierre de vías o fuerza mayor climática.
+          </div>
+        </article>
+
+        <article class="policy-card">
+          <div class="policy-card-header">
+            <span class="policy-icon" aria-hidden="true">👶</span>
+            <h3>{t.bookingPage.minorsTitle}</h3>
+          </div>
+          <p>
+            {t.bookingPage.minorsDesc}
+          </p>
+          <div class="policy-todo-box">
+            <b>TODO(cliente):</b> Confirmar tabla de edades mínimas según ruta (ej. 12 años para Salkantay, 8 años para Valle Sagrado) y descuentos para menores.
+          </div>
+        </article>
+      </div>
+
+      <div class="booking-cta-block" style="margin-top: 50px;">
+        <h2>¿Tienes preguntas sobre el proceso de reserva?</h2>
+        <p>Escríbenos directamente y nuestro equipo en Cusco te responderá con total transparencia.</p>
+        <a class="button button--gold" href={waLink('Hola Machupicchu Beyond, quisiera información sobre el proceso de reserva y formas de pago.')} target="_blank" rel="noopener noreferrer">
+          Hablar por WhatsApp <span>💬</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .step-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--inti-deep);
+    margin-bottom: 12px;
+  }
+  .booking-policy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 28px;
+  }
+  .policy-card {
+    background: #ffffff;
+    padding: 32px 28px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+  }
+  .policy-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .policy-icon {
+    font-size: 24px;
+  }
+  .policy-card-header h3 {
+    font-size: 18px;
+    color: var(--andean);
+    margin: 0;
+  }
+  .policy-card p {
+    font-size: 14px;
+    color: #555347;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .policy-todo-box {
+    margin-top: 18px;
+    background: #fbf9f4;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 3px solid var(--machu-light);
+    font-size: 12px;
+    color: #6a685c;
+    line-height: 1.5;
+  }
+  .policy-todo-box b {
+    color: var(--machu-deep);
+  }
+  .booking-cta-block {
+    text-align: center;
+    background: linear-gradient(135deg, var(--andean), var(--machu-deep));
+    color: #ffffff;
+    padding: clamp(32px, 5vw, 60px);
+    border-radius: 16px;
+  }
+  .booking-cta-block h2 {
+    color: #ffffff;
+    font-size: clamp(24px, 3.5vw, 36px);
+    margin: 0 0 12px;
+  }
+  .booking-cta-block p {
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 600px;
+    margin: 0 auto 24px;
+    font-size: 15px;
+  }
+</style>

@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import TourCatalog from '../../../components/TourCatalog.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../../i18n/utils';
+import { getToursByLocale } from '../../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+const allTours = await getToursByLocale(lang);
+const tours = allTours.filter((tour) => tour.data.kind === 'iniciacion');
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.catalog.filterInitiation} en Cusco | Machupicchu Beyond`}
+  description="Rutas de iniciación y sabiduría ancestral en comunidades Q'ero. Ritos de paso Karpay y convivencia comunitaria en las alturas."
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.routes, href: `/${lang}/rutas` },
+            { label: t.catalog.filterInitiation },
+          ]}
+        />
+      </div>
+      <p class="section-label">
+        <span>✦</span> LINAJE INCA · RITOS DE PASO · CONVIVENCIA COMUNAL
+      </p>
+      <h1>
+        Rutas de Iniciación<br />
+        <em>y sabiduría ancestral.</em>
+      </h1>
+      <p>
+        Encuentros de aprendizaje y ritos de paso Karpay en el territorio de la Nación Q'ero, guiados por Paqos tradicionales con absoluto respeto a sus normas comunitarias.
+      </p>
+    </section>
+
+    <section class="catalog section-wrap" style="padding-bottom: 90px;">
+      <TourCatalog tours={tours} showFilters={true} lang={lang} activeCategory="iniciacion" />
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>

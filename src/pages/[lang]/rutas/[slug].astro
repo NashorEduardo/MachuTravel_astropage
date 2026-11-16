@@ -1,0 +1,522 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import TourCatalog from '../../../components/TourCatalog.astro';
+import { site, waLink } from '../../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../../i18n/utils';
+import { getToursByLocale, type LocalizedTour } from '../../../i18n/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of SUPPORTED_LOCALES) {
+    const tours = await getToursByLocale(lang);
+    for (const tour of tours) {
+      paths.push({
+        params: { lang, slug: tour.slug },
+        props: { tour },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  tour: LocalizedTour;
+}
+
+const { lang, slug } = Astro.params as { lang: SupportedLocale; slug: string };
+const { tour } = Astro.props;
+const t = useTranslations(lang);
+const { Content } = await render(tour);
+
+const allTours = await getToursByLocale(lang);
+const relatedTours = allTours.filter((item) => item.slug !== tour.slug).slice(0, 3);
+
+const rawGallery = [tour.data.image, ...tour.data.gallery].filter(Boolean) as string[];
+const galleryImages = rawGallery.length
+  ? Array.from({ length: Math.max(3, rawGallery.length) }, (_, index) => rawGallery[index % rawGallery.length])
+  : [];
+
+const waMessage = lang === 'en'
+  ? `Hello Machupicchu Beyond, I would like to inquire about dates, availability, and pricing for: "${tour.data.title}".`
+  : lang === 'pt'
+    ? `Olá Machupicchu Beyond, gostaria de consultar datas, vagas e valores para: "${tour.data.title}".`
+    : `Hola Machupicchu Beyond, deseo consultar fechas disponibles y cotización para la experiencia: "${tour.data.title}".`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'TouristTrip',
+  name: tour.data.title,
+  description: tour.data.summary,
+  touristType: tour.data.kind,
+  provider: {
+    '@type': 'TravelAgency',
+    name: site.name,
+    legalName: site.legalName,
+    taxID: site.ruc,
+    telephone: site.phoneDisplay,
+    email: site.email,
+    address: site.address,
+  },
+  ...(tour.data.image ? { image: new URL(tour.data.image, site.url).toString() } : {}),
+};
+
+const faqSchema = tour.data.faq.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: tour.data.faq.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    }
+  : undefined;
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${tour.data.title} | ${site.name}`}
+  description={tour.data.summary}
+  image={tour.data.image || site.defaultImage}
+  schema={faqSchema ? [schema, faqSchema] : schema}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <div class="breadcrumb-wrap">
+      <Breadcrumbs
+        items={[
+          { label: t.nav.home, href: `/${lang}/` },
+          { label: t.nav.routes, href: `/${lang}/rutas` },
+          { label: tour.data.title },
+        ]}
+      />
+    </div>
+
+    <!-- HERO CINEMATOGRÁFICO DE LA RUTA -->
+    <section class="detail-hero detail-hero--layered">
+      {tour.data.image && (
+        <img
+          src={tour.data.image}
+          alt={tour.data.imageAlt || tour.data.title}
+          width="1800"
+          height="1100"
+          fetchpriority="high"
+        />
+      )}
+      <div>
+        <p class="section-label section-label--light">
+          <span>✦</span> {tour.data.kind.toUpperCase()} · {tour.data.place}
+        </p>
+        <h1>{tour.data.title}</h1>
+        <p>{tour.data.summary}</p>
+        
+        <div class="detail-hero__actions">
+          <a class="button button--gold" href={waLink(waMessage)} target="_blank" rel="noopener noreferrer">
+            {t.tourDetail.stickyInquire} <span>💬</span>
+          </a>
+          <a class="button button--dark" href="#itinerario">
+            {t.tourDetail.itineraryTitle} <span>↓</span>
+          </a>
+        </div>
+      </div>
+
+      <aside class="detail-side-card" data-tilt>
+        <span>{tour.data.tag}</span>
+        <b>{tour.data.days}</b>
+        <p>{tour.data.group}</p>
+        <small>{tour.data.difficulty || tour.data.level}</small>
+      </aside>
+    </section>
+
+    {tour.data.referentialImage && (
+      <p class="image-note" style="text-align: center; font-size: 11px; color: #828073; margin: 12px auto 0; max-width: 800px;">
+        {t.tourDetail.referentialImageNotice}
+      </p>
+    )}
+
+    <!-- BANDA RESUMEN TÉCNICO -->
+    <section class="detail-facts">
+      <div>
+        <span>{t.tourDetail.duration}</span>
+        <b>{tour.data.days}</b>
+      </div>
+      <div>
+        <span>{t.tourDetail.difficulty}</span>
+        <b>{tour.data.difficulty || tour.data.level}</b>
+      </div>
+      <div>
+        <span>{t.tourDetail.maxAltitude}</span>
+        <b>{tour.data.maxAltitude || 'Consultar'}</b>
+      </div>
+      <div>
+        <span>{t.tourDetail.departure}</span>
+        <b>{tour.data.departurePoint || 'Cusco'}</b>
+      </div>
+      <div>
+        <span>{t.tourDetail.priceEstimate}</span>
+        <b>{tour.data.priceFrom || tour.data.price || t.catalog.consult}</b>
+      </div>
+    </section>
+
+    <!-- CONTENIDO PRINCIPAL: 2 COLUMNAS (DETALLES + STICKY SIDEBAR) -->
+    <div class="section-wrap" style="margin-top: 50px;">
+      <div class="tour-detail-layout">
+        <!-- COLUMNA PRINCIPAL -->
+        <div class="tour-main-content">
+          <!-- ITINERARIO DETALLADO -->
+          <section id="itinerario" class="tour-itinerary-section" data-reveal>
+            <div class="section-heading">
+              <div>
+                <p class="section-label"><span>✦</span> PASO A PASO</p>
+                <h2>{t.tourDetail.itineraryTitle}</h2>
+              </div>
+              <p class="section-lead">
+                Estructura de la experiencia diseñada con tiempo para la adaptación física y la contemplación.
+              </p>
+            </div>
+
+            <div class="itinerary-accordion" style="margin-top: 32px;">
+              {tour.data.itinerary.map((item, idx) => (
+                <details class="itinerary-item" open={idx === 0}>
+                  <summary>
+                    <span class="itinerary-day-badge">{item.day}</span>
+                    <span class="itinerary-day-title">{item.title}</span>
+                    <span class="itinerary-toggle" aria-hidden="true">+</span>
+                  </summary>
+                  <div class="itinerary-body">
+                    <p>{item.text}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <!-- INCLUYE / NO INCLUYE -->
+          <section class="included-grid" data-reveal style="margin-top: 60px;">
+            <div>
+              <h3 style="font-size: 20px; font-weight: 700; color: var(--machu); margin-bottom: 18px;">
+                ✦ {t.tourDetail.includedTitle}
+              </h3>
+              <ul style="padding-left: 0; list-style: none;">
+                {tour.data.includes.map((item) => (
+                  <li style="display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f0ede4;">
+                    <span style="color: var(--inti-deep); font-weight: 700;">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 style="font-size: 20px; font-weight: 700; color: #858273; margin-bottom: 18px;">
+                ○ {t.tourDetail.excludedTitle}
+              </h3>
+              <ul style="padding-left: 0; list-style: none;">
+                {tour.data.excludes.map((item) => (
+                  <li style="display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f0ede4; color: #727063;">
+                    <span style="color: #b0ab9e;">—</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          <!-- QUÉ LLEVAR -->
+          {tour.data.whatToBring && tour.data.whatToBring.length > 0 && (
+            <section class="tour-spec-block glass-glow-card" data-reveal style="margin-top: 50px;">
+              <h3 style="font-size: 20px; font-weight: 700; color: var(--andean); margin-bottom: 16px;">
+                🎒 {t.tourDetail.whatToBringTitle}
+              </h3>
+              <ul class="spec-bullet-list">
+                {tour.data.whatToBring.map((item) => (
+                  <li>✦ {item}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <!-- REQUISITOS Y RESTRICCIONES -->
+          {tour.data.restrictions && tour.data.restrictions.length > 0 && (
+            <section class="tour-spec-block glass-glow-card" data-reveal style="margin-top: 30px;">
+              <h3 style="font-size: 20px; font-weight: 700; color: var(--andean); margin-bottom: 16px;">
+                ⚠️ {t.tourDetail.restrictionsTitle}
+              </h3>
+              <ul class="spec-bullet-list">
+                {tour.data.restrictions.map((item) => (
+                  <li>○ {item}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <!-- POLÍTICA DE CLIMA Y SEGURIDAD -->
+          {tour.data.weatherPolicy && (
+            <section class="tour-spec-block glass-glow-card" data-reveal style="margin-top: 30px;">
+              <h3 style="font-size: 20px; font-weight: 700; color: var(--andean); margin-bottom: 12px;">
+                🌦️ {t.tourDetail.weatherPolicyTitle}
+              </h3>
+              <p style="font-size: 14px; color: #5a5749; line-height: 1.7; margin: 0;">
+                {tour.data.weatherPolicy}
+              </p>
+            </section>
+          )}
+
+          <!-- RELATO EDITORIAL MARKDOWN -->
+          <div class="markdown-content" data-reveal style="margin-top: 50px;">
+            <Content />
+          </div>
+
+          <!-- GALERÍA MOSAICO -->
+          {galleryImages.length > 0 && (
+            <section class="tour-gallery" aria-labelledby="gallery-title" data-reveal style="margin-top: 60px;">
+              <div class="section-heading">
+                <div>
+                  <p class="section-label"><span>✦</span> {t.tourDetail.galleryTitle}</p>
+                  <h2 id="gallery-title">Paisajes del <em>sendero.</em></h2>
+                </div>
+              </div>
+              <div class="gallery-grid gallery-grid--mosaic">
+                {galleryImages.map((image, index) => (
+                  <a href={image} target="_blank" rel="noopener noreferrer" class:list={[index === 0 ? 'gallery-grid__feature' : '']}>
+                    <img
+                      src={image}
+                      alt={`${tour.data.title}, fotografía ${index + 1}`}
+                      loading="lazy"
+                      width="1200"
+                      height="800"
+                    />
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <!-- FAQ DEL TOUR -->
+          {tour.data.faq.length > 0 && (
+            <section class="tour-faq-panel" data-reveal style="margin-top: 60px;">
+              <div>
+                <p class="section-label"><span>✦</span> {t.tourDetail.faqTitle}</p>
+                <h2>Aclaraciones sobre esta <em>ruta.</em></h2>
+              </div>
+              <div class="faq-list faq-list--panel" style="margin-top: 24px;">
+                {tour.data.faq.map((item) => (
+                  <details>
+                    <summary>{item.q}<span>+</span></summary>
+                    <p>{item.a}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        <!-- STICKY CONCIERGE SIDEBAR -->
+        <aside class="concierge-sidebar">
+          <div class="concierge-sticky-card glass-glow-card" data-tilt>
+            <span class="concierge-badge">✦ ATENCIÓN DESDE CUSCO</span>
+            <h3 style="margin: 12px 0 8px;">{tour.data.title}</h3>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.6; margin: 0 0 16px;">
+              {tour.data.subtitle}
+            </p>
+
+            <div class="concierge-specs">
+              <div>
+                <span>{t.tourDetail.duration}</span>
+                <b>{tour.data.days}</b>
+              </div>
+              <div>
+                <span>{t.tourDetail.maxAltitude}</span>
+                <b>{tour.data.maxAltitude || 'Consultar'}</b>
+              </div>
+              <div>
+                <span>{t.tourDetail.difficulty}</span>
+                <b>{tour.data.difficulty || tour.data.level}</b>
+              </div>
+              <div>
+                <span>{t.tourDetail.priceEstimate}</span>
+                <b>{tour.data.priceFrom || tour.data.price || t.catalog.consult}</b>
+              </div>
+            </div>
+
+            <div class="concierge-cta-stack" style="margin-top: 24px;">
+              <a
+                class="button button--gold"
+                href={waLink(waMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style="width: 100%; text-align: center;"
+              >
+                {t.tourDetail.stickyInquire} <span>💬</span>
+              </a>
+              <a
+                class="button button--dark"
+                href={`/${lang}/contacto?ruta=${encodeURIComponent(tour.data.title)}`}
+                style="width: 100%; text-align: center;"
+              >
+                {t.tourDetail.stickyBook} <span>✦</span>
+              </a>
+            </div>
+
+            <p style="margin: 16px 0 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.6);">
+              Oficina oficial en Calle Zetas 109, Cusco.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- OTRAS RUTAS RECOMENDADAS -->
+    <section class="related-tours section-wrap" data-reveal style="margin-top: 80px; padding-bottom: 100px;">
+      <div class="section-heading">
+        <div>
+          <p class="section-label"><span>✦</span> {t.tourDetail.relatedTitle}</p>
+          <h2>Caminos complementarios<br /><em>en los Andes.</em></h2>
+        </div>
+        <a class="under-link" href={`/${lang}/rutas`}>
+          {t.catalog.filterAll} <span>↗</span>
+        </a>
+      </div>
+      <TourCatalog tours={relatedTours} lang={lang} />
+    </section>
+
+    <!-- BARRA STICKY MÓVIL DE CONVERSIÓN -->
+    <div class="mobile-sticky-cta" aria-label="Acciones rápidas para móvil">
+      <div class="mobile-sticky-info">
+        <b>{tour.data.title}</b>
+        <span>{tour.data.days} · {tour.data.priceFrom || tour.data.price || t.catalog.consult}</span>
+      </div>
+      <a class="button button--gold mobile-sticky-btn" href={waLink(waMessage)} target="_blank" rel="noopener noreferrer">
+        WhatsApp <span>💬</span>
+      </a>
+    </div>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .itinerary-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .itinerary-item {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .itinerary-item[open] {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    border-color: var(--machu-light);
+  }
+  .itinerary-item summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 600;
+  }
+  .itinerary-item summary::-webkit-details-marker {
+    display: none;
+  }
+  .itinerary-day-badge {
+    background: var(--machu);
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .itinerary-day-title {
+    flex: 1;
+    font-size: 16px;
+    color: var(--andean);
+  }
+  .itinerary-toggle {
+    font-size: 20px;
+    color: var(--machu);
+    transition: transform 0.2s ease;
+  }
+  .itinerary-item[open] .itinerary-toggle {
+    transform: rotate(45deg);
+  }
+  .itinerary-body {
+    padding: 0 20px 20px 20px;
+    color: #555347;
+    font-size: 14px;
+    line-height: 1.7;
+    border-top: 1px solid #f2eee4;
+    margin-top: 4px;
+    padding-top: 14px;
+  }
+  .tour-spec-block {
+    padding: 24px 28px;
+    border-radius: 12px;
+  }
+  .spec-bullet-list {
+    padding-left: 0;
+    list-style: none;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .spec-bullet-list li {
+    font-size: 14px;
+    color: #555347;
+    line-height: 1.5;
+  }
+
+  /* Barra sticky móvil */
+  .mobile-sticky-cta {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: rgba(14, 15, 10, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 20px;
+    border-top: 1px solid rgba(255, 202, 2, 0.3);
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  @media (max-width: 899px) {
+    .mobile-sticky-cta {
+      display: flex;
+    }
+  }
+  .mobile-sticky-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .mobile-sticky-info b {
+    color: #ffffff;
+    font-size: 13px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .mobile-sticky-info span {
+    color: var(--inti);
+    font-size: 11px;
+  }
+  .mobile-sticky-btn {
+    padding: 10px 18px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+</style>

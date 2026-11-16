@@ -1,0 +1,182 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site, philosophy, team, waLink } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.aboutPage.heroTitle} ${t.aboutPage.heroTitleEm} | Machupicchu Beyond`}
+  description={site.history[lang] || site.history.es}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.about },
+          ]}
+        />
+      </div>
+      <p class="section-label"><span>✦</span> {t.aboutPage.heroKicker}</p>
+      <h1>
+        {t.aboutPage.heroTitle}<br />
+        <em>{t.aboutPage.heroTitleEm}</em>
+      </h1>
+      <p>
+        {t.aboutPage.heroDesc}
+      </p>
+    </section>
+
+    <!-- HISTORIA OFICIAL -->
+    <section class="about-grid section-wrap" data-reveal style="padding-top: 40px;">
+      <div>
+        <p class="section-label"><span>✦</span> {t.aboutPage.historyTitle}</p>
+        <h2>Nuestra <em>esencia.</em></h2>
+      </div>
+      <div class="history-content-box">
+        <p style="font-size: 16px; line-height: 1.8; color: var(--andean);">
+          {site.history[lang] || site.history.es}
+        </p>
+        <p style="font-size: 14px; line-height: 1.7; color: #555347; margin-top: 18px;">
+          Entendemos que el viajero consciente no busca acumular postales superficiales, sino sumergirse con humildad en el territorio: caminar junto a glaciares milenarios, escuchar la sabiduría de los sabios andinos y asegurar que su paso por Cusco deje una huella de respeto, beneficio mutuo y regeneración ambiental.
+        </p>
+      </div>
+    </section>
+
+    <!-- PILARES Y VALORES -->
+    <section class="section-wrap" style="padding-block: 60px 40px;" data-reveal>
+      <div class="section-heading">
+        <div>
+          <p class="section-label"><span>✦</span> {t.aboutPage.valuesTitle}</p>
+          <h2>Principios que nos <em>mueven.</em></h2>
+        </div>
+      </div>
+      <div class="value-grid" style="margin-top: 36px;">
+        {philosophy.map((item) => (
+          <article class="glass-glow-card" data-tilt>
+            <span style="font-size: 12px; font-weight: 700; color: var(--inti-deep); letter-spacing: 0.1em;">
+              {item.number} / MACHUPICCHU BEYOND
+            </span>
+            <h3 style="margin: 12px 0 10px; font-size: 20px;">{item.title}</h3>
+            <p style="color: #555347; line-height: 1.6; font-size: 14px;">{item.desc}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- EQUIPO Y RED DE ACOMPAÑAMIENTO CON PLACEHOLDERS PARA EL CLIENTE -->
+    <section class="team section-wrap" data-reveal style="border-top: 1px solid #dedbce; padding-block: 80px 40px;">
+      <p class="section-label"><span>✦</span> {t.aboutPage.teamTitle}</p>
+      <h2>Profesionales y <em>sabios locales.</em></h2>
+      <p class="section-lead" style="max-width: 720px; margin-top: 14px;">
+        Estructura operativa multidisciplinaria con base en Cusco. Los perfiles y fotografías de cada guía oficial y maestro se encuentran en actualización continua.
+      </p>
+
+      <div class="team-grid" style="margin-top: 40px;">
+        {team.map((item) => (
+          <article class="glass-glow-card" data-tilt>
+            <h3 style="font-size: 18px; color: var(--andean); margin-bottom: 10px;">{item.role}</h3>
+            <p style="font-size: 13px; color: #555347; line-height: 1.6;">{item.text}</p>
+            <small style="display: block; margin-top: 12px; font-size: 11px; color: var(--machu-deep); font-weight: 500;">
+              TODO(cliente): Cargar fotografía y biografía detallada
+            </small>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- DATOS LEGALES Y TRANSPARENCIA VISIBLE -->
+    <section class="section-wrap" style="padding-bottom: 90px;" data-reveal>
+      <div class="legal-notice-box glass-glow-card">
+        <div class="section-label"><span>✦</span> {t.aboutPage.legalNoticeTitle}</div>
+        <h3 style="font-size: 22px; margin: 12px 0 16px; color: var(--andean);">
+          MOTOANDES PERU E.I.R.L.
+        </h3>
+        <div class="legal-details-grid">
+          <div>
+            <b>Nombre comercial:</b>
+            <span>{site.name}</span>
+          </div>
+          <div>
+            <b>Razón social:</b>
+            <span>{site.legalName}</span>
+          </div>
+          <div>
+            <b>RUC (Registro Único de Contribuyentes):</b>
+            <span>{site.ruc}</span>
+          </div>
+          <div>
+            <b>Dirección oficial:</b>
+            <span>{site.address}</span>
+          </div>
+          <div>
+            <b>Correo oficial:</b>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </div>
+          <div>
+            <b>WhatsApp oficial:</b>
+            <a href={waLink('Hola Machupicchu Beyond, los contacto desde su página web.')} target="_blank" rel="noopener noreferrer">{site.phoneDisplay}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .history-content-box {
+    background: #ffffff;
+    padding: clamp(24px, 4vw, 40px);
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .legal-notice-box {
+    background: #ffffff;
+    padding: clamp(28px, 4vw, 44px);
+    border-radius: 14px;
+    border: 1px solid rgba(89, 103, 64, 0.2);
+  }
+  .legal-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0ede4;
+  }
+  .legal-details-grid b {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .legal-details-grid span, .legal-details-grid a {
+    font-size: 14px;
+    color: var(--andean);
+    font-weight: 500;
+  }
+  .legal-details-grid a {
+    color: var(--machu-deep);
+    text-decoration: underline;
+  }
+</style>

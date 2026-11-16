@@ -1,44 +1,82 @@
 ---
-import { nav, site, waLink } from '../data/site';
-const social = Object.entries(site.social).filter(([, url]) => Boolean(url));
+import { site, waLink } from '../data/site';
+import { getLocaleFromUrl, useTranslations, type SupportedLocale } from '../i18n/utils';
+
+interface Props {
+  lang?: SupportedLocale;
+}
+
+const { lang } = Astro.props;
+const currentLocale = lang || getLocaleFromUrl(Astro.url);
+const t = useTranslations(currentLocale);
+
+const footerNav = [
+  { href: `/${currentLocale}/rutas`, label: t.nav.routes },
+  { href: `/${currentLocale}/ceremonias`, label: t.nav.ceremonies },
+  { href: `/${currentLocale}/impacto`, label: t.nav.impact },
+  { href: `/${currentLocale}/nosotros`, label: t.nav.about },
+  { href: `/${currentLocale}/reservas`, label: t.nav.booking },
+  { href: `/${currentLocale}/diario`, label: t.nav.journal },
+  { href: `/${currentLocale}/contacto`, label: t.nav.contact },
+];
 ---
 
 <footer class="site-footer">
   <div class="footer-brand-block">
-    <a class="footer-mark" href="/" aria-label={`${site.name}, inicio`}>
-      <img src="/images/brand/logo-machupicchu-beyond-white.jpg" alt="" width="481" height="423" loading="lazy" />
+    <a class="footer-mark" href={`/${currentLocale}/`} aria-label={`${site.name}, ${t.nav.home}`}>
+      <img src="/images/brand/logo-machupicchu-beyond-white.jpg" alt="Machupicchu Beyond" width="481" height="423" loading="lazy" />
     </a>
     <div class="footer-copy">
       <p class="footer-name">MACHUPICCHU<br />BEYOND</p>
-      <p class="footer-tag">LUXURY SPIRITUAL JOURNEYS</p>
+      <p class="footer-tag">TREKKING · MÍSTICA · IMPACTO SOCIAL</p>
     </div>
   </div>
 
-  <nav class="footer-nav" aria-label="Navegación secundaria">
-    {nav.map((item) => <a href={item.href}>{item.label}</a>)}
-    <a href="/contacto">Concierge</a>
+  <nav class="footer-nav" aria-label="Navegación del pie de página">
+    {footerNav.map((item) => (
+      <a href={item.href}>{item.label}</a>
+    ))}
   </nav>
 
   <div class="footer-contact">
-    <a href={waLink('Hola, quisiera información sobre las experiencias sagradas de Machupicchu Beyond.')} target="_blank" rel="noopener noreferrer">
-      WhatsApp Concierge · {site.phoneDisplay}
+    <a href={waLink('Hola Machupicchu Beyond, quisiera información sobre sus rutas y experiencias en Cusco.')} target="_blank" rel="noopener noreferrer">
+      WhatsApp: {site.phoneDisplay}
     </a>
     <a href={`mailto:${site.email}`}>{site.email}</a>
-    <span>Base en {site.city}</span>
-    {social.map(([name, url]) => (
-      <a href={url} target="_blank" rel="noopener noreferrer">{name}</a>
-    ))}
+    <span>{site.address}</span>
   </div>
 
-  <p class="footer-note">
-    Herencia andina viva. Ayni, reciprocidad y respeto por los Apus. Un viaje que transforma la mirada y honra el territorio.
-  </p>
+  <!-- Bloque de datos legales y transparencia oficial -->
+  <div class="footer-legal-company">
+    <p>
+      <b>{t.footer.legalCompany}</b> · <b>{t.footer.ruc}</b>
+    </p>
+    <p class="footer-note">
+      {t.footer.tagline}
+    </p>
+  </div>
 
   <div class="footer-legal">
-    <a href="/privacidad">Privacidad</a>
-    <a href="/terminos">Términos del Servicio</a>
+    <a href={`/${currentLocale}/reservas`}>{t.footer.bookingInfo}</a>
+    <a href={`/${currentLocale}/privacidad`}>{t.footer.privacy}</a>
+    <a href={`/${currentLocale}/terminos`}>{t.footer.terms}</a>
   </div>
 
   <a class="back-top" href="#main-content" aria-label="Volver al inicio del contenido">↑</a>
-  <small class="copyright">© {new Date().getFullYear()} {site.name} · All rights reserved</small>
+  <small class="copyright">© {new Date().getFullYear()} {site.name} · {site.legalName} · {t.footer.rights}</small>
 </footer>
+
+<style>
+  .footer-legal-company {
+    max-width: 720px;
+    margin: 18px 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
+  .footer-legal-company b {
+    color: var(--inti);
+    font-weight: 600;
+  }
+</style>

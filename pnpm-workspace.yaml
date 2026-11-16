@@ -1,0 +1,9 @@
+supportedArchitectures:
+  os:
+    - linux
+  cpu:
+    - arm64
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+verifyDepsBeforeRun: false

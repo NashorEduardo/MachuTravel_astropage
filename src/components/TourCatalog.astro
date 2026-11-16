@@ -1,69 +1,61 @@
 ---
-interface TourItem {
-  id: string;
-  data: {
-    title: string;
-    subtitle?: string;
-    tag: string;
-    kind: string;
-    place: string;
-    days: string;
-    price?: string;
-    image?: string;
-    imageAlt?: string;
-    gallery?: string[];
-    summary: string;
-    group?: string;
-    level?: string;
-    referentialImage?: boolean;
-  };
-}
+import { getLocaleFromUrl, useTranslations, type SupportedLocale } from '../i18n/utils';
+import type { LocalizedTour } from '../i18n/content';
 
 interface Props {
-  tours: TourItem[];
+  tours: LocalizedTour[];
   showFilters?: boolean;
+  lang?: SupportedLocale;
+  activeCategory?: string;
 }
 
-const { tours, showFilters = false } = Astro.props;
+const { tours, showFilters = false, lang, activeCategory = 'all' } = Astro.props;
+const currentLocale = lang || getLocaleFromUrl(Astro.url);
+const t = useTranslations(currentLocale);
 
-// Categoría formateada con elegancia
 function getKindLabel(kind: string) {
   switch (kind) {
-    case 'iniciacion':
-      return 'Iniciación Ancestral';
-    case 'peregrinacion':
-      return 'Peregrinación Sagrada';
+    case 'trekking':
+      return t.catalog.filterTreks;
     case 'ceremonia':
-      return 'Ceremonia de Ayni';
+      return t.catalog.filterCeremonies;
+    case 'peregrinacion':
+      return t.catalog.filterPilgrimages;
+    case 'iniciacion':
+      return t.catalog.filterInitiation;
     default:
       return kind;
   }
-}
-
-// Nivel de conexión mística
-function getConnectionBadge(level?: string) {
-  if (!level) return 'Conexión Consciente';
-  if (level.toLowerCase().includes('exigente')) return 'Alta Montaña · Trascendencia';
-  if (level.toLowerCase().includes('suave')) return 'Meditativo · Valles Cálidos';
-  if (level.toLowerCase().includes('interior')) return 'Introspección Profunda';
-  return 'Conexión Armónica';
 }
 ---
 
 <div class="tour-catalog-wrapper">
   {showFilters && (
-    <div class="filters" aria-label="Filtrar por llamado espiritual">
-      <button class="filter-btn is-active" type="button" data-filter="all">Todas las rutas</button>
-      <button class="filter-btn" type="button" data-filter="ceremonia">Ceremonias</button>
-      <button class="filter-btn" type="button" data-filter="peregrinacion">Peregrinaciones</button>
-      <button class="filter-btn" type="button" data-filter="iniciacion">Iniciación</button>
+    <div class="filters" aria-label="Filtrar por categoría">
+      <button class:list={['filter-btn', activeCategory === 'all' ? 'is-active' : '']} type="button" data-filter="all">
+        {t.catalog.filterAll}
+      </button>
+      <button class:list={['filter-btn', activeCategory === 'trekking' ? 'is-active' : '']} type="button" data-filter="trekking">
+        {t.catalog.filterTreks}
+      </button>
+      <button class:list={['filter-btn', activeCategory === 'ceremonia' ? 'is-active' : '']} type="button" data-filter="ceremonia">
+        {t.catalog.filterCeremonies}
+      </button>
+      <button class:list={['filter-btn', activeCategory === 'peregrinacion' ? 'is-active' : '']} type="button" data-filter="peregrinacion">
+        {t.catalog.filterPilgrimages}
+      </button>
+      <button class:list={['filter-btn', activeCategory === 'iniciacion' ? 'is-active' : '']} type="button" data-filter="iniciacion">
+        {t.catalog.filterInitiation}
+      </button>
     </div>
   )}
 
   <div class="catalog-grid" id="catalog-cards-grid">
     {tours.map((tour) => {
       const kindLabel = getKindLabel(tour.data.kind);
-      const connectionLevel = getConnectionBadge(tour.data.level);
+      const difficulty = tour.data.difficulty || tour.data.level;
+      const maxAltitude = tour.data.maxAltitude;
+      const priceDisplay = tour.data.priceFrom || tour.data.price || t.catalog.consult;
 
       return (
         <article
@@ -72,7 +64,11 @@ function getConnectionBadge(level?: string) {
           data-reveal
           data-tilt
         >
-          <a class="catalog-card-anchor" href={`/rutas/${tour.id}`} aria-label={`Ver detalles de ${tour.data.title}`}>
+          <a
+            class="catalog-card-anchor"
+            href={`/${currentLocale}/rutas/${tour.slug}`}
+            aria-label={`${t.catalog.exploreBtn}: ${tour.data.title}`}
+          >
             <div class="catalog-media">
               {tour.data.image ? (
                 <img
@@ -98,13 +94,25 @@ function getConnectionBadge(level?: string) {
               <h2>{tour.data.title}</h2>
               <p>{tour.data.summary}</p>
 
-              <!-- Indicador de conexión espiritual -->
-              <div style="font-size: 10px; color: var(--machu-deep); background: rgba(89, 103, 64, 0.08); padding: 6px 10px; border-radius: 6px; margin-bottom: 16px; font-weight: 500; letter-spacing: 0.04em;">
-                ⚡ {connectionLevel}
+              <!-- Especificaciones técnicas rápidas -->
+              <div class="catalog-specs-row">
+                {maxAltitude && (
+                  <span class="spec-chip" title={t.catalog.altitudeLabel}>
+                    🏔️ {maxAltitude}
+                  </span>
+                )}
+                {difficulty && (
+                  <span class="spec-chip" title={t.catalog.difficultyLabel}>
+                    ⚡ {difficulty}
+                  </span>
+                )}
+                <span class="spec-chip spec-chip--price" title={t.catalog.fromPrice}>
+                  💰 {priceDisplay}
+                </span>
               </div>
 
               <div class="catalog-card-footer">
-                <b>Explorar experiencia</b>
+                <b>{t.catalog.exploreBtn}</b>
                 <span aria-hidden="true">↗</span>
               </div>
             </div>
@@ -114,6 +122,31 @@ function getConnectionBadge(level?: string) {
     })}
   </div>
 </div>
+
+<style>
+  .catalog-specs-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .spec-chip {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--andean);
+    background: rgba(89, 103, 64, 0.08);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(89, 103, 64, 0.12);
+    letter-spacing: 0.02em;
+  }
+  .spec-chip--price {
+    background: rgba(255, 202, 2, 0.14);
+    border-color: rgba(217, 167, 0, 0.25);
+    color: #614a00;
+    font-weight: 600;
+  }
+</style>
 
 <script is:inline>
   (() => {
@@ -136,13 +169,13 @@ function getConnectionBadge(level?: string) {
               setTimeout(() => {
                 card.style.opacity = '1';
                 card.style.transform = 'none';
-              }, 30);
+              }, 20);
             } else {
               card.style.opacity = '0';
               card.style.transform = 'scale(0.96)';
               setTimeout(() => {
                 card.style.display = 'none';
-              }, 200);
+              }, 180);
             }
           });
         });

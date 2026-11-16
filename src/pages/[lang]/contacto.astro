@@ -1,0 +1,204 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site, waLink } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+import { getToursByLocale } from '../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+const tours = await getToursByLocale(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.contactPage.heroTitle} ${t.contactPage.heroTitleEm} | Machupicchu Beyond`}
+  description={t.contactPage.heroDesc}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <div class="breadcrumb-wrap" style="background: var(--machu-deep); border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <Breadcrumbs
+        items={[
+          { label: t.nav.home, href: `/${lang}/` },
+          { label: t.nav.contact },
+        ]}
+      />
+    </div>
+
+    <section class="contact-page">
+      <div>
+        <p class="section-label section-label--light">
+          <span>✦</span> {t.contactPage.heroKicker}
+        </p>
+        <h1>
+          {t.contactPage.heroTitle}<br />
+          <em>{t.contactPage.heroTitleEm}</em>
+        </h1>
+        <p>
+          {t.contactPage.heroDesc}
+        </p>
+
+        <div class="concierge-perks">
+          <div class="concierge-perk">
+            <span>✦</span>
+            <span>Atención rápida por WhatsApp en menos de 12 horas</span>
+          </div>
+          <div class="concierge-perk">
+            <span>✦</span>
+            <span>Base operativa física en Calle Zetas 109, Cusco</span>
+          </div>
+          <div class="concierge-perk">
+            <span>✦</span>
+            <span>Asesoría honesta sobre clima, aclimatación y dificultad</span>
+          </div>
+        </div>
+
+        <div class="contact-direct-wrap">
+          <a class="contact-direct" href={waLink('Hola Machupicchu Beyond, deseo consultar información sobre sus expediciones y rutas.')} target="_blank" rel="noopener noreferrer">
+            <span style="color: var(--inti);">💬</span> {t.contactPage.directPhone} ↗
+          </a>
+          <a class="contact-direct" href={`mailto:${site.email}`}>
+            <span style="color: var(--inti);">✉️</span> {t.contactPage.directEmail} ↗
+          </a>
+          <a class="contact-direct" href={site.googleMapsUrl} target="_blank" rel="noopener noreferrer">
+            <span style="color: var(--inti);">📍</span> {t.contactPage.directAddress} ↗
+          </a>
+        </div>
+
+        <!-- ENLACE LIVIANO A GOOGLE MAPS SIN DEPENDENCIAS PESADAS -->
+        <div class="light-map-box" style="margin-top: 28px;">
+          <div class="map-text">
+            <b>{t.contactPage.mapTitle}</b>
+            <p>{site.address} (a pocas cuadras del Qorikancha y Plaza de Armas)</p>
+          </div>
+          <a class="button button--dark" href={site.googleMapsUrl} target="_blank" rel="noopener noreferrer" style="margin-top: 12px; display: inline-flex;">
+            {t.contactPage.mapLinkText} <span>↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- FORMULARIO CON MENSAJE PRELLENADO DE WHATSAPP -->
+      <form class="contact-form" id="contact-form" data-wa={`https://wa.me/${site.whatsapp}`}>
+        <h3>{t.contactPage.heroTitleEm}</h3>
+        <p style="margin: 0; font-size: 13px; color: #6e6b60; line-height: 1.6;">
+          Completa tus datos y se abrirá WhatsApp con el mensaje estructurado para iniciar la conversación de inmediato con nuestro equipo en Cusco.
+        </p>
+
+        <label>
+          {t.contactPage.formName}
+          <input name="nombre" required autocomplete="name" placeholder="Ej. Camila Rojas" />
+        </label>
+
+        <label>
+          {t.contactPage.formEmail}
+          <input name="correo" type="email" required autocomplete="email" placeholder="camila@ejemplo.com" />
+        </label>
+
+        <label>
+          {t.contactPage.formPhone}
+          <input name="telefono" type="tel" placeholder="+51 987 654 321" />
+        </label>
+
+        <label>
+          {t.contactPage.formTour}
+          <select name="ruta" id="ruta-select">
+            <option value="Orientación general / Consultar según mis fechas">Orientación general / Elegir según mis fechas</option>
+            {tours.map((item) => (
+              <option value={item.data.title}>{item.data.title} ({item.data.days})</option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          {t.contactPage.formMessage}
+          <textarea
+            name="mensaje"
+            rows="3"
+            placeholder="Fechas estimadas de viaje, número de personas, condición física o preguntas específicas..."
+          ></textarea>
+        </label>
+
+        <button class="button button--gold" type="submit" style="width: 100%;">
+          {t.contactPage.formSubmit} <span>💬</span>
+        </button>
+
+        <small>
+          Atención oficial por MOTOANDES PERU E.I.R.L. · RUC 20614108437 · Calle Zetas 109, Cusco, Perú.
+        </small>
+      </form>
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .light-map-box {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .map-text b {
+    color: var(--inti);
+    font-size: 14px;
+    display: block;
+  }
+  .map-text p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    margin: 4px 0 0;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const initContact = () => {
+      // Pre-seleccionar tour si viene en query param ?ruta=...
+      const params = new URLSearchParams(window.location.search);
+      const rutaParam = params.get('ruta');
+      const selectEl = document.getElementById('ruta-select');
+      if (rutaParam && selectEl) {
+        for (let i = 0; i < selectEl.options.length; i++) {
+          if (selectEl.options[i].text.toLowerCase().includes(rutaParam.toLowerCase()) ||
+              selectEl.options[i].value.toLowerCase().includes(rutaParam.toLowerCase())) {
+            selectEl.selectedIndex = i;
+            break;
+          }
+        }
+      }
+
+      const form = document.querySelector('#contact-form');
+      form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const nombre = formData.get('nombre') || '';
+        const correo = formData.get('correo') || '';
+        const tel = formData.get('telefono') || '';
+        const ruta = formData.get('ruta') || '';
+        const mensaje = formData.get('mensaje') || '';
+
+        const text = `Hola Machupicchu Beyond. Mi nombre es ${nombre} (Correo: ${correo}${tel ? ', Tel: ' + tel : ''}). Deseo consultar información sobre: "${ruta}". Mensaje o fechas estimadas: "${mensaje}".`;
+        const waUrl = `${form.dataset.wa}?text=${encodeURIComponent(text)}`;
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initContact, { once: true });
+    } else {
+      initContact();
+    }
+    document.addEventListener('astro:page-load', initContact);
+  })();
+</script>

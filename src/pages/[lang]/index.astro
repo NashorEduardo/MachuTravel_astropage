@@ -1,0 +1,530 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { site, waLink, reusedJourneyImages, featuredNumbers, testimonials, siteFaq } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+import { getToursByLocale, getBlogPostsByLocale } from '../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+
+const allTours = await getToursByLocale(lang);
+const featuredTours = allTours.slice(0, 4);
+const posts = (await getBlogPostsByLocale(lang)).slice(0, 2);
+const imageLoop = [...reusedJourneyImages, ...reusedJourneyImages];
+
+const waHeroMessage = lang === 'en'
+  ? 'Hello Machupicchu Beyond, I would like to inquire about your treks and ancestral journeys.'
+  : lang === 'pt'
+    ? 'Olá Machupicchu Beyond, gostaria de informações sobre seus treks e experiências nos Andes.'
+    : 'Hola Machupicchu Beyond, quisiera información sobre sus rutas de trekking y experiencias místicas.';
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${site.name} | ${t.hero.title} ${t.hero.titleEm}`}
+  description={t.hero.description}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <!-- HERO CINEMATOGRÁFICO DE MARCA -->
+    <section class="hero hero--immersive" aria-labelledby="hero-title">
+      <div class="hero-backdrop-container">
+        <img
+          class="hero-backdrop"
+          src="/images/journeys/machu-picchu-mist.jpg"
+          alt="Machu Picchu místico cubierto por la neblina sagrada de los Andes"
+          width="2200"
+          height="1467"
+          fetchpriority="high"
+        />
+      </div>
+      
+      <div class="hero-overlay"></div>
+      <div class="hero-mist-mask" aria-hidden="true"></div>
+
+      <div class="hero-inner">
+        <!-- Emblema Sagrado -->
+        <div class="hero-brand-symbol">
+          <div class="symbol-halo" aria-hidden="true">
+            <img src="/images/brand/simbolo-machupicchu-beyond.jpg" alt="Machupicchu Beyond" width="44" height="44" />
+          </div>
+          <p class="eyebrow">
+            {t.hero.kicker}
+          </p>
+        </div>
+
+        <h1 id="hero-title">
+          {t.hero.title}<br />
+          <em>{t.hero.titleEm}</em>
+        </h1>
+        
+        <p class="hero-description">
+          {t.hero.description}
+        </p>
+
+        <!-- CTA DOBLE PRINCIPAL -->
+        <div class="hero-actions">
+          <a class="button button--gold" href={`/${lang}/rutas`}>
+            {t.hero.ctaRoutes} <span>↗</span>
+          </a>
+          <a class="button button--dark" href={waLink(waHeroMessage)} target="_blank" rel="noopener noreferrer">
+            {t.hero.ctaWhatsApp} <span>💬</span>
+          </a>
+          <a class="hero-secondary" href={`/${lang}/impacto`}>
+            {t.hero.ctaImpact} <span>→</span>
+          </a>
+        </div>
+
+        <!-- Indicadores flotantes de confianza -->
+        <div class="hero-floaters" aria-hidden="true">
+          <article class="floating-note" data-tilt>
+            <span>OFICINA CENTRAL</span>
+            <b>Calle Zetas 109</b>
+            <p>Atención y base operativa en Cusco, Perú.</p>
+          </article>
+          <article class="floating-note floating-note--gold" data-tilt>
+            <span>TURISMO REGENERATIVO</span>
+            <b>Impacto Social</b>
+            <p>Apoyo a comunidades campesinas, niñez rural y bosques nativos.</p>
+          </article>
+        </div>
+      </div>
+
+      <p class="hero-caption">
+        CUSCO & MACHU PICCHU · PERÚ <span>MOTOANDES PERU E.I.R.L. · RUC 20614108437</span>
+      </p>
+    </section>
+
+    <!-- MARQUEE DE IDENTIDAD -->
+    <div class="marquee" aria-hidden="true">
+      <span>TREKKING DE ALTA MONTAÑA · CEREMONIAS ANCESTRALES · AYNI · PACHAMAMA · RESPONSABILIDAD SOCIAL · BOSQUES DE QUEÑUAL · TREKKING DE ALTA MONTAÑA · CEREMONIAS ANCESTRALES · AYNI ·</span>
+    </div>
+
+    <!-- BANDA DE INDICADORES OPERATIVOS -->
+    <section class="section-wrap numbers-band" data-reveal>
+      {featuredNumbers.map((item) => (
+        <article data-tilt>
+          <b>{item.value}</b>
+          <span>{item.label}</span>
+        </article>
+      ))}
+    </section>
+
+    <!-- TRES EJES DE POSICIONAMIENTO -->
+    <section class="section-wrap" style="padding-block: 80px 60px;" data-reveal>
+      <div class="section-heading">
+        <div>
+          <div class="section-label"><span>✦</span> {t.axes.label}</div>
+          <h2>{t.axes.title}<br /><em>{t.axes.titleEm}</em></h2>
+        </div>
+        <p class="section-lead">
+          {t.axes.lead}
+        </p>
+      </div>
+
+      <div class="value-grid" style="margin-top: 40px;">
+        <article class="glass-glow-card" data-tilt>
+          <span style="color: var(--inti-deep); font-weight: 700; letter-spacing: 0.1em; font-size: 11px;">
+            {t.axes.trekking.badge}
+          </span>
+          <h3 style="margin-top: 10px; font-size: 22px;">{t.axes.trekking.title}</h3>
+          <p style="margin-top: 12px; color: #5a5749; line-height: 1.7;">
+            {t.axes.trekking.desc}
+          </p>
+          <a class="under-link" href={`/${lang}/rutas/treks`} style="margin-top: 16px; display: inline-flex;">
+            {t.catalog.filterTreks} <span>↗</span>
+          </a>
+        </article>
+
+        <article class="glass-glow-card" data-tilt>
+          <span style="color: var(--inti-deep); font-weight: 700; letter-spacing: 0.1em; font-size: 11px;">
+            {t.axes.mystic.badge}
+          </span>
+          <h3 style="margin-top: 10px; font-size: 22px;">{t.axes.mystic.title}</h3>
+          <p style="margin-top: 12px; color: #5a5749; line-height: 1.7;">
+            {t.axes.mystic.desc}
+          </p>
+          <a class="under-link" href={`/${lang}/ceremonias`} style="margin-top: 16px; display: inline-flex;">
+            {t.nav.ceremonies} <span>↗</span>
+          </a>
+        </article>
+
+        <article class="glass-glow-card" data-tilt>
+          <span style="color: var(--inti-deep); font-weight: 700; letter-spacing: 0.1em; font-size: 11px;">
+            {t.axes.impact.badge}
+          </span>
+          <h3 style="margin-top: 10px; font-size: 22px;">{t.axes.impact.title}</h3>
+          <p style="margin-top: 12px; color: #5a5749; line-height: 1.7;">
+            {t.axes.impact.desc}
+          </p>
+          <a class="under-link" href={`/${lang}/impacto`} style="margin-top: 16px; display: inline-flex;">
+            {t.nav.impact} <span>↗</span>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <!-- CATÁLOGO DESTACADO DE TOURS Y TREKS -->
+    <section class="journeys section-wrap" id="rutas" style="padding-top: 20px;">
+      <div class="section-heading" data-reveal>
+        <div>
+          <div class="section-label"><span>✦</span> {t.catalog.label}</div>
+          <h2>{t.catalog.title}<br /><em>{t.catalog.titleEm}</em></h2>
+        </div>
+        <a class="under-link" href={`/${lang}/rutas`}>
+          {t.common.viewAll} <span>↗</span>
+        </a>
+      </div>
+
+      <div style="margin-top: 36px;">
+        <div class="journey-grid journey-grid--dynamic">
+          {featuredTours.map((tour, i) => (
+            <a class:list={["journey-card", `journey-card--${i + 1}`]} href={`/${lang}/rutas/${tour.slug}`} data-reveal data-tilt>
+              {tour.data.image && (
+                <img
+                  src={tour.data.image}
+                  alt={tour.data.imageAlt || tour.data.title}
+                  loading="lazy"
+                  width="1200"
+                  height="800"
+                />
+              )}
+              <span class="journey-count">0{i + 1} / {tour.data.kind}</span>
+              <div class="journey-info">
+                <span>{tour.data.place} · {tour.data.days}</span>
+                <h3>{tour.data.title}</h3>
+                <p>{tour.data.summary}</p>
+                <b>{t.catalog.exploreBtn} <i>↗</i></b>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOQUE DESTACADO DE RESPONSABILIDAD SOCIAL Y AMBIENTAL -->
+    <section class="section-wrap" style="padding-block: 80px;" data-reveal>
+      <div class="impact-featured-banner glass-glow-card">
+        <div class="impact-featured-copy">
+          <p class="section-label" style="color: var(--inti);">
+            <span>✦</span> {t.socialImpactPage.heroKicker}
+          </p>
+          <h2>{t.socialImpactPage.heroTitle} <em>{t.socialImpactPage.heroTitleEm}</em></h2>
+          <p>
+            {t.socialImpactPage.heroDesc}
+          </p>
+
+          <div class="impact-pillars-summary">
+            <div class="impact-pill-item">
+              <b>🌾 {t.socialImpactPage.pillar1Title}</b>
+              <span>{t.socialImpactPage.pillar1Desc}</span>
+            </div>
+            <div class="impact-pill-item">
+              <b>🎒 {t.socialImpactPage.pillar2Title}</b>
+              <span>{t.socialImpactPage.pillar2Desc}</span>
+            </div>
+            <div class="impact-pill-item">
+              <b>🌲 {t.socialImpactPage.pillar3Title}</b>
+              <span>{t.socialImpactPage.pillar3Desc}</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 32px;">
+            <a class="button button--gold" href={`/${lang}/impacto`}>
+              {t.hero.ctaImpact} <span>↗</span>
+            </a>
+          </div>
+        </div>
+        <div class="impact-featured-media">
+          <img src="/images/journeys/andean-trail.jpg" alt="Comunidades andinas y senderos de altura" loading="lazy" width="800" height="600" />
+        </div>
+      </div>
+    </section>
+
+    <!-- BELT DE IMÁGENES CONTINUO -->
+    <section class="image-belt" aria-label="Galería de rutas andinas" data-reveal>
+      <div class="image-belt__track">
+        {imageLoop.map((image, index) => (
+          <figure class="image-belt__item">
+            <img src={image} alt={`Paisaje andino ${index + 1}`} loading="lazy" width="1200" height="800" />
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <!-- TRES FORMAS DE RECORRER (PATHWAYS) -->
+    <section class="pathways" data-reveal>
+      <div class="pathways-copy">
+        <div class="section-label section-label--light"><span>✦</span> EXPERIENCIAS A TU MEDIDA</div>
+        <h2>Un viaje.<br />Tres <em>senderos.</em></h2>
+        <p>
+          Elige entre desafiar tus límites en trekkings glaciares, participar en ceremonias de reciprocidad o convivir en comunidades originarias.
+        </p>
+        <a class="button button--gold" href={`/${lang}/rutas`}>
+          {t.catalog.filterAll} <span>↗</span>
+        </a>
+      </div>
+      <div class="pathway-list">
+        <a href={`/${lang}/rutas/treks`} data-tilt>
+          <span>01</span>
+          <div>
+            <h3>{t.catalog.filterTreks}</h3>
+            <p>Salkantay, Ausangate, Camino Inca y Huancayo con guías oficiales de montaña.</p>
+          </div>
+          <b>↗</b>
+        </a>
+        <a href={`/${lang}/ceremonias`} data-tilt>
+          <span>02</span>
+          <div>
+            <h3>{t.catalog.filterCeremonies}</h3>
+            <p>Despachos a la Pachamama y ritos de Ayni facilitados por maestros locales.</p>
+          </div>
+          <b>↗</b>
+        </a>
+        <a href={`/${lang}/rutas/iniciacion`} data-tilt>
+          <span>03</span>
+          <div>
+            <h3>{t.catalog.filterInitiation}</h3>
+            <p>Convivencia y ritos de paso Karpay en las alturas de la Nación Q'ero.</p>
+          </div>
+          <b>↗</b>
+        </a>
+      </div>
+    </section>
+
+    <!-- CÓMO RESERVAR (RESUMEN) -->
+    <section class="section-wrap" style="padding-block: 80px 40px;" data-reveal>
+      <div class="section-heading">
+        <div>
+          <div class="section-label"><span>✦</span> {t.bookingPage.heroKicker}</div>
+          <h2>{t.bookingPage.heroTitle}<br /><em>{t.bookingPage.heroTitleEm}</em></h2>
+        </div>
+        <a class="under-link" href={`/${lang}/reservas`}>
+          {t.footer.bookingInfo} completa <span>↗</span>
+        </a>
+      </div>
+
+      <div class="booking-steps-grid" style="margin-top: 40px;">
+        <article class="step-card" data-tilt>
+          <span class="step-number">01</span>
+          <h3>{t.bookingPage.step1Title}</h3>
+          <p>{t.bookingPage.step1Desc}</p>
+        </article>
+        <article class="step-card" data-tilt>
+          <span class="step-number">02</span>
+          <h3>{t.bookingPage.step2Title}</h3>
+          <p>{t.bookingPage.step2Desc}</p>
+        </article>
+        <article class="step-card" data-tilt>
+          <span class="step-number">03</span>
+          <h3>{t.bookingPage.step3Title}</h3>
+          <p>{t.bookingPage.step3Desc}</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- TESTIMONIOS REFERENCIALES -->
+    <section class="comment-showcase" aria-labelledby="comments-title" data-reveal>
+      <div class="section-wrap">
+        <div class="section-heading">
+          <div>
+            <div class="section-label"><span>✦</span> EXPERIENCIAS DE VIAJEROS</div>
+            <h2 id="comments-title">Voces del <em>camino.</em></h2>
+          </div>
+          <p class="section-lead">
+            Comentarios y valoraciones de referencia mientras consolidamos los testimonios oficiales de la temporada.
+          </p>
+        </div>
+      </div>
+      <div class="comments-marquee" style="margin-top: 36px;">
+        <div class="comments-marquee__track">
+          {[...testimonials, ...testimonials].map((item) => (
+            <article class="comment-card" data-tilt>
+              <p>“{item.quote}”</p>
+              <footer>
+                {item.name} {item.origin ? `· ${item.origin}` : ''}
+              </footer>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- DIARIO DEL CAMINO -->
+    {posts.length > 0 && (
+      <section class="journal section-wrap" data-reveal style="padding-top: 60px;">
+        <div class="section-heading">
+          <div>
+            <div class="section-label"><span>✦</span> {t.nav.journal}</div>
+            <h2>Relatos de los <em>Andes.</em></h2>
+          </div>
+          <a class="under-link" href={`/${lang}/diario`}>
+            {t.common.viewAll} <span>↗</span>
+          </a>
+        </div>
+        <div class="journal-grid">
+          {posts.map((post) => (
+            <article class="journal-card" data-tilt>
+              <span>{post.data.place} · {post.data.date}</span>
+              <h3><a href={`/${lang}/diario/${post.slug}`}>{post.data.title}</a></h3>
+              <p>{post.data.excerpt}</p>
+              <a class="under-link" href={`/${lang}/diario/${post.slug}`}>
+                {t.common.learnMore} <span>↗</span>
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- FAQ -->
+    <section class="faq section-wrap" data-reveal style="padding-block: 80px;">
+      <div>
+        <div class="section-label"><span>✦</span> PREGUNTAS FRECUENTES</div>
+        <h2>Claridad antes<br /><em>de viajar.</em></h2>
+        <a class="under-link" href={`/${lang}/contacto`} style="margin-top: 20px;">
+          ¿Deseas una consulta personal? Escríbenos <span>↗</span>
+        </a>
+      </div>
+      <div class="faq-list">
+        {siteFaq.map((item) => (
+          <details>
+            <summary>{item.q}<span>+</span></summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- CIERRE Y CTA FINAL -->
+    <section class="closing contact-band closing--visual">
+      <div class="closing-copy" data-reveal>
+        <div class="section-label section-label--light">ATENCIÓN PERSONALIZADA</div>
+        <h2>Tu viaje comienza con una<br /><em>conversación.</em></h2>
+        <p>
+          Desde nuestra oficina en Calle Zetas 109, Cusco, preparamos tu expedición o ceremonia a la medida de tu grupo. Escríbenos directamente por WhatsApp.
+        </p>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px;">
+          <a class="button button--gold" href={waLink(waHeroMessage)} target="_blank" rel="noopener noreferrer">
+            {t.hero.ctaWhatsApp} <span>💬</span>
+          </a>
+          <a class="button button--dark" href={`/${lang}/contacto`}>
+            {t.nav.contact} <span>✦</span>
+          </a>
+        </div>
+      </div>
+      <div class="closing-visual" data-reveal>
+        <img class="closing-visual__main" src={reusedJourneyImages[1]} alt="Machu Picchu" width="1200" height="900" />
+        <img class="closing-visual__small closing-visual__small--one" src={reusedJourneyImages[3]} alt="Laguna Humantay" width="520" height="360" />
+        <img class="closing-visual__small closing-visual__small--two" src={reusedJourneyImages[2]} alt="Sendero andino" width="520" height="360" />
+      </div>
+      <span class="closing-mark">M</span>
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .impact-featured-banner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: clamp(32px, 5vw, 64px);
+    background: linear-gradient(135deg, rgba(89, 103, 64, 0.95), rgba(44, 52, 31, 0.98));
+    color: #ffffff;
+    border-radius: 16px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .impact-featured-banner {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+  }
+  .impact-featured-copy h2 {
+    color: #ffffff;
+    font-size: clamp(28px, 3.5vw, 42px);
+    margin: 12px 0 16px;
+  }
+  .impact-featured-copy h2 em {
+    color: var(--inti);
+    font-style: italic;
+  }
+  .impact-featured-copy p {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .impact-pillars-summary {
+    display: grid;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .impact-pill-item {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .impact-pill-item b {
+    display: block;
+    color: var(--inti);
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .impact-pill-item span {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.5;
+  }
+  .impact-featured-media img {
+    width: 100%;
+    height: 100%;
+    max-height: 440px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .booking-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .step-card {
+    background: #ffffff;
+    padding: 32px 28px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s ease;
+  }
+  .step-number {
+    display: inline-block;
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--inti-deep);
+    margin-bottom: 12px;
+  }
+  .step-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    color: var(--andean);
+  }
+  .step-card p {
+    font-size: 13px;
+    color: #636155;
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>

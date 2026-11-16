@@ -1,0 +1,270 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TourCatalog from '../../components/TourCatalog.astro';
+import { site, waLink } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+import { getToursByLocale } from '../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+
+const allTours = await getToursByLocale(lang);
+const ceremonialTours = allTours.filter((tour) => tour.data.kind === 'ceremonia' || tour.data.kind === 'iniciacion');
+
+// Estructura formal de experiencias ceremoniales con campos claros y estado "Por confirmar"
+const ceremonyExperiences = [
+  {
+    title: 'Despacho a la Pachamama (Ofrenda Tradicional de Ayni)',
+    whatIs: 'Ceremonia ancestral de armonización y reciprocidad donde se confecciona una mesa sagrada con elementos naturales, flores, semillas y kintus de hojas de coca para agradecer a la Madre Tierra.',
+    whoLeads: 'Maestro Paqo o Pampamesayoq andino de linaje quechua reconocido en su comunidad.',
+    where: 'Parajes naturales protegidos del Valle Sagrado de los Incas (Cusco).',
+    duration: 'Día completo (4 a 6 horas de actividad ceremonial pausada).',
+    includes: 'Transporte privado, maestro ceremonial, todos los insumos rituales, facilitador/traductor y almuerzo campestre.',
+    requirements: 'Actitud de respeto, ropa cómoda de abrigo ligero y abstinencia de alcohol previa.',
+    whatToKnow: 'No es una atracción turística ni un show fotográfico. La participación es voluntaria y se realiza en reverente silencio y escucha.',
+    status: 'Experiencia activa',
+    slug: 'despacho-pachamama',
+  },
+  {
+    title: 'Rito de Karpay en la Nación Q\'ero (Iniciación Energética)',
+    whatIs: 'Transmisión espiritual y rito de paso tradicional transmitido de maestro a iniciado para conectar con las fuerzas tutelares de los Apus y la Pachamama.',
+    whoLeads: 'Sabios y sabias Paqos de las comunidades altas de Hatun Q\'ero.',
+    where: 'Comunidades altoandinas de Paucartambo (Cusco, sobre 4,000 msnm).',
+    duration: '5 días / 4 noches en expedición de altura y convivencia comunitaria.',
+    includes: 'Transporte 4x4, arrieros, acémilas, alojamiento comunal/campamento, alimentación andina y honorarios del maestro.',
+    requirements: 'Aclimatación previa rigurosa (mínimo 3 días en Cusco), excelente salud cardiovascular y vestimenta para frío extremo.',
+    whatToKnow: 'El rito pertenece a la comunidad y a los maestros; se celebra únicamente si las autoridades locales y los maestros consideran propicio el momento.',
+    status: 'Por confirmar fechas de salida con la comunidad',
+    slug: 'camino-qero',
+  },
+  {
+    title: 'Retiro de Medicina Ancestral en Ceja de Selva',
+    whatIs: 'Proceso de introspección, dieta limpia y sesiones nocturnas con plantas maestras tradicionales para la sanación emocional y reconexión profunda con la naturaleza.',
+    whoLeads: 'Curandero tradicional amazónico con equipo de contención y acompañamiento psicológico.',
+    where: 'Albergue ecológico aislado en la ceja de selva / bosque nuboso de Cusco.',
+    duration: '4 días / 3 noches de retiro cerrado.',
+    includes: 'Traslado privado, 3 noches de hospedaje en cabañas, alimentación de dieta, 2 sesiones ceremoniales y círculos de integración.',
+    requirements: 'Entrevista médica y psicológica previa obligatoria. Estricta dieta preparatoria.',
+    whatToKnow: 'Incompatible con medicación psiquiátrica (antidepresivos, ansiolíticos) y problemas cardíacos. No tiene fines recreativos.',
+    status: 'Por confirmar según evaluación previa del facilitador',
+    slug: 'retiro-ceja-de-selva',
+  },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.ceremoniesPage.heroTitle} ${t.ceremoniesPage.heroTitleEm} | Machupicchu Beyond`}
+  description={t.ceremoniesPage.heroDesc}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.ceremonies },
+          ]}
+        />
+      </div>
+      <p class="section-label">
+        <span>✦</span> {t.ceremoniesPage.heroKicker}
+      </p>
+      <h1>
+        {t.ceremoniesPage.heroTitle}<br />
+        <em>{t.ceremoniesPage.heroTitleEm}</em>
+      </h1>
+      <p>
+        {t.ceremoniesPage.heroDesc}
+      </p>
+    </section>
+
+    <!-- ESTRUCTURA TRANSPARENTE POR EXPERIENCIA -->
+    <section class="section-wrap" style="padding-block: 60px 40px;" data-reveal>
+      <div class="section-heading">
+        <div>
+          <p class="section-label"><span>✦</span> {t.ceremoniesPage.structureTitle}</p>
+          <h2>Encuentros y <em>ceremonias.</em></h2>
+        </div>
+        <p class="section-lead">
+          Presentamos cada experiencia con claridad técnica y cultural. Ninguna ceremonia se comercializa como entretenimiento masivo.
+        </p>
+      </div>
+
+      <div class="ceremonies-grid" style="margin-top: 40px;">
+        {ceremonyExperiences.map((item) => (
+          <article class="ceremony-card glass-glow-card" data-tilt>
+            <div class="ceremony-card-header">
+              <span class="ceremony-status-tag">
+                ✦ {item.status}
+              </span>
+              <h3>{item.title}</h3>
+            </div>
+
+            <div class="ceremony-field-list">
+              <div class="ceremony-field">
+                <b>{t.ceremoniesPage.whatIs}</b>
+                <p>{item.whatIs}</p>
+              </div>
+              <div class="ceremony-field">
+                <b>{t.ceremoniesPage.whoLeads}</b>
+                <p>{item.whoLeads}</p>
+              </div>
+              <div class="ceremony-field">
+                <b>{t.ceremoniesPage.where}</b>
+                <p>{item.where}</p>
+              </div>
+              <div class="ceremony-field">
+                <b>{t.ceremoniesPage.duration}</b>
+                <p>{item.duration}</p>
+              </div>
+              <div class="ceremony-field">
+                <b>{t.ceremoniesPage.included}</b>
+                <p>{item.includes}</p>
+              </div>
+              <div class="ceremony-field">
+                <b>{t.ceremoniesPage.requirements}</b>
+                <p>{item.requirements}</p>
+              </div>
+              <div class="ceremony-field ceremony-field--important">
+                <b>{t.ceremoniesPage.whatToKnow}</b>
+                <p>{item.whatToKnow}</p>
+              </div>
+            </div>
+
+            <div class="ceremony-card-action">
+              <a class="button button--gold" href={`/${lang}/rutas/${item.slug}`}>
+                {t.catalog.exploreBtn} <span>↗</span>
+              </a>
+              <a class="under-link" href={waLink(`Hola, quisiera consultar detalles y fechas para: ${item.title}`)} target="_blank" rel="noopener noreferrer">
+                Consultar por WhatsApp <span>💬</span>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- ÉTICA Y RESPETO -->
+    <section class="values section-wrap" data-reveal style="border-top: 1px solid #dedbce; padding-block: 80px 40px;">
+      <div class="section-heading">
+        <div>
+          <div class="section-label"><span>✦</span> PRINCIPIOS DE RESPETO</div>
+          <h2>La ética innegociable<br />del <em>Ayni.</em></h2>
+        </div>
+        <p class="section-lead">
+          Nuestra labor como agencia se limita a la facilitación logística y el cuidado de los viajeros; la autoridad espiritual pertenece exclusivamente a los sabios y maestras que conducen cada rito.
+        </p>
+      </div>
+      <div class="value-grid">
+        <article data-tilt>
+          <span>01 / AUTORIDAD</span>
+          <h3>Maestros Tradicionales</h3>
+          <p>Cada rito es celebrado por paqos o curanderos reconocidos por sus propias comunidades originarias.</p>
+        </article>
+        <article data-tilt>
+          <span>02 / LIBERTAD</span>
+          <h3>Participación Consciente</h3>
+          <p>No se fuerza ningún dogma. Cada viajero participa en los gestos que sienta sinceros y guarda silencio cuando lo desee.</p>
+        </article>
+        <article data-tilt>
+          <span>03 / ASIMILACIÓN</span>
+          <h3>Espacio de Integración</h3>
+          <p>Damos tiempo amplio para descansar, asimilar y conversar sobre la experiencia vivida sin prisas de agenda.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CATÁLOGO CEREMONIAL -->
+    <section class="section-wrap" style="padding-bottom: 90px;">
+      <div class="section-heading" data-reveal>
+        <div>
+          <p class="section-label"><span>✦</span> FICHA DE CADA EXPERIENCIA</p>
+          <h2>Rutas con componente <em>ceremonial.</em></h2>
+        </div>
+      </div>
+      <TourCatalog tours={ceremonialTours} lang={lang} />
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .ceremonies-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .ceremony-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: clamp(24px, 4vw, 40px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  }
+  .ceremony-status-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--machu-deep);
+    background: rgba(89, 103, 64, 0.1);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .ceremony-card-header h3 {
+    font-size: clamp(22px, 3vw, 28px);
+    margin: 8px 0 24px;
+    color: var(--andean);
+  }
+  .ceremony-field-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding-block: 20px;
+    border-top: 1px solid #f0ede4;
+    border-bottom: 1px solid #f0ede4;
+  }
+  .ceremony-field b {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--machu-deep);
+    margin-bottom: 6px;
+  }
+  .ceremony-field p {
+    font-size: 14px;
+    color: #555347;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .ceremony-field--important {
+    grid-column: 1 / -1;
+    background: rgba(255, 202, 2, 0.08);
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 3px solid var(--inti-deep);
+  }
+  .ceremony-card-action {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+</style>

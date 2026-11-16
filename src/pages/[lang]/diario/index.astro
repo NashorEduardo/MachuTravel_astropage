@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { site } from '../../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../../i18n/utils';
+import { getBlogPostsByLocale } from '../../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+const posts = await getBlogPostsByLocale(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.nav.journal} | Machupicchu Beyond`}
+  description="Reflexiones, crónicas y cosmovisión andina: el respeto a los Apus, ceremonias de despacho y aprendizaje en las alturas de Cusco."
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.journal },
+          ]}
+        />
+      </div>
+      <p class="section-label"><span>✦</span> MEMORIA VIVA · REFLEXIONES DE RUTA</p>
+      <h1>
+        Diario del <em>camino.</em>
+      </h1>
+      <p>
+        Artículos y notas sobre la ética del viaje, el significado de los ritos andinos y la preservación cultural en las comunidades que visitamos.
+      </p>
+    </section>
+
+    <section class="journal section-wrap" style="padding-bottom: 100px;">
+      <div class="journal-grid">
+        {posts.map((post) => (
+          <article class="journal-card glass-glow-card" data-tilt>
+            <span>{post.data.place} · {post.data.date}</span>
+            <h3><a href={`/${lang}/diario/${post.slug}`}>{post.data.title}</a></h3>
+            <p>{post.data.excerpt}</p>
+            <a class="under-link" href={`/${lang}/diario/${post.slug}`} style="margin-top: 14px; display: inline-flex;">
+              {t.common.learnMore} <span>↗</span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>

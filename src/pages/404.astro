@@ -2,5 +2,36 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { site } from '../data/site';
 ---
-<BaseLayout title="Página no encontrada | Machupicchu Beyond" description="La página que buscas no está disponible." noindex={true}><SiteHeader /><main id="main-content"><section class="not-found section-wrap"><p class="section-label">ERROR 404</p><p class="not-found-code">404</p><h1>Este camino no lleva<br />a donde <em>buscabas.</em></h1><p>La ruta pudo cambiar o la dirección ya no existe. Puedes volver al inicio o explorar nuestras experiencias.</p><div class="hero-actions"><a class="button button--green" href="/rutas">Explorar rutas ↗</a><a class="under-link" href="/">Volver al inicio</a></div></section></main><SiteFooter /></BaseLayout>
+
+<BaseLayout
+  title={`Página no encontrada | ${site.name}`}
+  description="La página que buscas no está disponible o ha cambiado de ruta."
+  noindex={true}
+>
+  <SiteHeader lang="es" />
+
+  <main id="main-content">
+    <section class="not-found section-wrap" style="padding-block: 100px; text-align: center;">
+      <p class="section-label" style="justify-content: center;">ERROR 404</p>
+      <p class="not-found-code" style="font-family: var(--font-serif); font-size: clamp(60px, 10vw, 120px); font-weight: 800; color: var(--inti); margin: 0;">404</p>
+      <h1 style="font-size: clamp(28px, 4vw, 44px); margin: 12px 0 20px;">
+        Este camino no lleva<br />a donde <em>buscabas.</em>
+      </h1>
+      <p style="max-width: 540px; margin: 0 auto 32px; color: #6a685c; line-height: 1.7;">
+        La ruta pudo haber cambiado o el enlace no está disponible. Puedes volver al inicio o explorar nuestro catálogo de expediciones andinas.
+      </p>
+      <div class="hero-actions" style="justify-content: center; display: flex; gap: 16px; flex-wrap: wrap;">
+        <a class="button button--gold" href="/es/rutas">
+          Explorar rutas y treks <span>↗</span>
+        </a>
+        <a class="button button--dark" href="/es/">
+          Volver al inicio
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter lang="es" />
+</BaseLayout>

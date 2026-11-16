@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.legal.termsTitle} | ${site.name}`}
+  description={`Términos del servicio y condiciones de reserva de ${site.name} (${site.legalName}).`}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <div class="breadcrumb-wrap">
+      <Breadcrumbs
+        items={[
+          { label: t.nav.home, href: `/${lang}/` },
+          { label: t.legal.termsTitle },
+        ]}
+      />
+    </div>
+
+    <article class="legal-page section-wrap" style="max-width: 860px; padding-bottom: 100px;">
+      <p class="section-label"><span>✦</span> INFORMACIÓN LEGAL OFICIAL</p>
+      <h1>Términos del <em>servicio.</em></h1>
+      
+      <p>
+        El presente sitio web es operado por <strong>{site.legalName}</strong> (RUC <strong>{site.ruc}</strong>), con domicilio legal en <strong>{site.address}</strong>. Al navegar en este sitio o contratar servicios de la marca comercial <strong>{site.name}</strong>, el usuario acepta las siguientes condiciones generales.
+      </p>
+
+      <h2>1. Naturaleza de los servicios</h2>
+      <p>
+        {site.name} organiza y opera programas de trekking de alta montaña, turismo místico, retiros y experiencias culturales con base en Cusco. La información publicada en este sitio tiene carácter informativo e ilustrativo; los itinerarios, precios finales y especificaciones técnicas se ratifican individualmente previo a cualquier reserva formal.
+      </p>
+
+      <!-- NUEVA SECCIÓN OBLIGATORIA CON PLACEHOLDERS ESTRUCTURADOS -->
+      <h2>2. Reservas, pagos y cancelaciones</h2>
+      <p>
+        Las condiciones contractuales de contratación, cobro y anulación de expediciones se rigen por los siguientes principios:
+      </p>
+      <ul>
+        <li>
+          <strong>Proceso de reserva:</strong> La reserva formal se perfecciona únicamente tras la emisión de la cotización escrita, la recepción del adelanto pactado y el envío de la ficha médica / datos de pasaporte del viajero.
+        </li>
+        <li>
+          <strong>Adelanto de reserva:</strong> Para asegurar boletos oficiales de tren, cupos de guardaparques y guías de montaña, se requiere el abono de un adelanto de <code>[POR CONFIRMAR PORCENTAJE/MONTO]</code>.
+        </li>
+        <li>
+          <strong>Métodos de pago:</strong> Se aceptan transferencias bancarias, tarjetas de crédito/débito y plataformas de pago digital <code>[POR CONFIRMAR PASARELAS Y POSIBLES COMISIONES]</code>. El saldo restante debe cancelarse <code>[POR CONFIRMAR PLAZO ANTES DE LA SALIDA]</code>.
+        </li>
+        <li>
+          <strong>Política de cancelación y reembolsos:</strong> En caso de desistimiento voluntario por parte del cliente, las devoluciones estarán sujetas a la anticipación del aviso:
+          <ul>
+            <li>Cancelaciones con más de <code>[POR CONFIRMAR DÍAS]</code> de anticipación: reembolso del <code>[POR CONFIRMAR %]</code> deduciendo gastos administrativos y boletos no reembolsables.</li>
+            <li>Cancelaciones con menos de <code>[POR CONFIRMAR DÍAS]</code> de anticipación: <code>[POR CONFIRMAR CONDICIÓN]</code>.</li>
+            <li>Los boletos oficiales emitidos por el Ministerio de Cultura de Perú (Camino Inca y Machu Picchu) son de carácter personal, no reembolsables y no transferibles según la legislación vigente.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Política de reprogramación:</strong> El cambio de fecha estará condicionado a la disponibilidad de guías y a las políticas de los proveedores de transporte y reservas oficiales <code>[POR CONFIRMAR PENALIDADES APLICABLES]</code>.
+        </li>
+        <li>
+          <strong>Modificaciones por clima o fuerza mayor:</strong> En actividades de montaña, la seguridad de los viajeros es prioritaria. Si un tramo se modifica por derrumbes, nevadas o alertas meteorológicas, el guía determinará rutas alternas de seguridad sin que ello constituya incumplimiento contractual <code>[POR CONFIRMAR PROTOCOLO DE REUBICACIÓN]</code>.
+        </li>
+        <li>
+          <strong>Condiciones para niños y menores de edad:</strong> Los menores deben estar acompañados en todo momento por sus padres o tutores legales. La edad mínima para expediciones de gran altitud se rige por evaluación técnica <code>[POR CONFIRMAR TABLA DE EDADES MÍNIMAS]</code>.
+        </li>
+      </ul>
+
+      <h2>3. Salud, altitud y responsabilidad personal</h2>
+      <p>
+        Muchas de nuestras rutas se desarrollan a más de 4,000 metros sobre el nivel del mar. Todo viajero tiene la obligación de declarar antecedentes médicos relevantes (cardiopatías, afecciones respiratorias, alergias severas) antes de la partida. Es obligatorio contar con un seguro de viaje que cubra asistencia médica de emergencia y evacuación en montaña.
+      </p>
+
+      <h2>4. Respeto cultural y consentimiento comunitario</h2>
+      <p>
+        El viajero se compromete a respetar las normas de convivencia comunal en las visitas a comunidades campesinas (como Q'ero, Pacchanta o Waqrapukara). Queda prohibido fotografiar ceremonias o recintos sagrados sin el consentimiento expreso del maestro o autoridad comunal.
+      </p>
+
+      <h2>5. Propiedad intelectual</h2>
+      <p>
+        Los textos, marcas y elementos gráficos de este sitio web pertenecen a {site.legalName}. Las imágenes referenciales mantienen los créditos de sus respectivos autores.
+      </p>
+
+      <h2>6. Contacto legal</h2>
+      <p>
+        Para cualquier notificación o consulta sobre estos términos, puede dirigirse a nuestra oficina física en <strong>{site.address}</strong> o escribir al correo <a href={`mailto:${site.email}`}>{site.email}</a>.
+      </p>
+
+      <p style="margin-top: 32px; font-size: 12px; color: var(--muted);">
+        <strong>Última actualización:</strong> Noviembre de 2026.
+      </p>
+    </article>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>

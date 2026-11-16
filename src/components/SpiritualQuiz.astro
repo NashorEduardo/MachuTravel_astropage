@@ -287,8 +287,8 @@ const toursMap = allTours.reduce((acc, tour) => {
         if (linkEl) linkEl.href = `/rutas/${selectedTour.id}`;
         
         if (waEl) {
-          const msg = `Hola, completé el oráculo en la web de Machupicchu Beyond. Mi llamado andino es: "${selectedTour.title}". Quisiera consultar disponibilidad y fechas para mi viaje.`;
-          waEl.href = `https://wa.me/51943491959?text=${encodeURIComponent(msg)}`;
+          const msg = `Hola, completé el oráculo en la web de Machupicchu Beyond. Mi ruta recomendada es: "${selectedTour.title}". Quisiera consultar disponibilidad y fechas para mi viaje.`;
+          waEl.href = `https://wa.me/51977373935?text=${encodeURIComponent(msg)}`;
         }
 
         setStep('result');

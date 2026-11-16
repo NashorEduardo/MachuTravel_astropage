@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import TourCatalog from '../../../components/TourCatalog.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../../i18n/utils';
+import { getToursByLocale } from '../../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+const allTours = await getToursByLocale(lang);
+const tours = allTours.filter((tour) => tour.data.kind === 'peregrinacion');
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.catalog.filterPilgrimages} en los Andes | Machupicchu Beyond`}
+  description="Peregrinaciones de montaña al Apu Ausangate y santuarios incas. Caminatas sagradas en grupos reducidos con sentido y reverencia."
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.routes, href: `/${lang}/rutas` },
+            { label: t.catalog.filterPilgrimages },
+          ]}
+        />
+      </div>
+      <p class="section-label">
+        <span>✦</span> CAMINATAS SACRAS · DIÁLOGO CON LOS APUS
+      </p>
+      <h1>
+        Peregrinaciones Sagradas<br />
+        <em>hacia las alturas.</em>
+      </h1>
+      <p>
+        Travesías a pie donde el esfuerzo físico se entrelaza con el recogimiento interior y el respeto por los guardianes de la cordillera.
+      </p>
+    </section>
+
+    <section class="catalog section-wrap" style="padding-bottom: 90px;">
+      <TourCatalog tours={tours} showFilters={true} lang={lang} activeCategory="peregrinacion" />
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>

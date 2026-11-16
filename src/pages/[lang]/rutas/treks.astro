@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import TourCatalog from '../../../components/TourCatalog.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../../i18n/utils';
+import { getToursByLocale } from '../../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+const allTours = await getToursByLocale(lang);
+const trekTours = allTours.filter((tour) => tour.data.kind === 'trekking');
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.catalog.filterTreks} en Cusco y Perú | Machupicchu Beyond`}
+  description="Expediciones de trekking en los Andes: Salkantay, Ausangate, Camino Inca y Huancayo. Rutas de alta montaña con guías certificados y responsabilidad social."
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.routes, href: `/${lang}/rutas` },
+            { label: t.catalog.filterTreks },
+          ]}
+        />
+      </div>
+      <p class="section-label">
+        <span>✦</span> ALTA MONTAÑA · PASOS GLACIARES · AVENTURA TÉCNICA
+      </p>
+      <h1>
+        Treks de Montaña<br />
+        <em>en los Andes peruanos.</em>
+      </h1>
+      <p>
+        Caminatas exigentes hacia pasos nevados, glaciares y santuarios históricos. Con guías profesionales de montaña, arrieros locales y un ritmo que cuida la salud y la integridad del grupo.
+      </p>
+    </section>
+
+    <section class="catalog section-wrap" style="padding-bottom: 90px;">
+      <TourCatalog tours={trekTours} showFilters={true} lang={lang} activeCategory="trekking" />
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>

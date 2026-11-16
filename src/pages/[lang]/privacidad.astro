@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.legal.privacyTitle} | ${site.name}`}
+  description={`Política de privacidad y protección de datos personales de ${site.name} (${site.legalName}).`}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <div class="breadcrumb-wrap">
+      <Breadcrumbs
+        items={[
+          { label: t.nav.home, href: `/${lang}/` },
+          { label: t.legal.privacyTitle },
+        ]}
+      />
+    </div>
+
+    <article class="legal-page section-wrap" style="max-width: 860px; padding-bottom: 100px;">
+      <p class="section-label"><span>✦</span> PROTECCIÓN DE DATOS PERSONALES</p>
+      <h1>Política de <em>privacidad.</em></h1>
+      
+      <p>
+        Esta política describe el tratamiento de los datos personales recopilados a través del sitio web de <strong>{site.name}</strong>, marca de la empresa <strong>{site.legalName}</strong> (RUC <strong>{site.ruc}</strong>), con domicilio en <strong>{site.address}</strong>, en cumplimiento con la Ley N° 29733 (Ley de Protección de Datos Personales de la República del Perú) y estándares internacionales aplicables.
+      </p>
+
+      <h2>1. Datos que recopilamos</h2>
+      <p>
+        Cuando un usuario solicita información o reserva una ruta a través de nuestro sitio, WhatsApp o correo electrónico, podemos recopilar:
+      </p>
+      <ul>
+        <li>Nombre y apellidos completos.</li>
+        <li>Documento de identidad o número de pasaporte (indispensable para la emisión de boletos de tren y permisos oficiales a Machu Picchu o Camino Inca).</li>
+        <li>Nacionalidad, fecha de nacimiento y género.</li>
+        <li>Dirección de correo electrónico y número de teléfono/WhatsApp.</li>
+        <li>Información médica o física relevante (alergias, historial de altitud, restricciones dietarias).</li>
+      </ul>
+
+      <h2>2. Finalidad del tratamiento</h2>
+      <p>
+        Los datos proporcionados se emplean exclusivamente para:
+      </p>
+      <ul>
+        <li>Gestionar y cotizar consultas sobre expediciones y ceremonias andinas.</li>
+        <li>Emitir billetes oficiales nominativos ante el Ministerio de Cultura, SERNANP y empresas de tren (PeruRail / Inca Rail).</li>
+        <li>Coordinar la seguridad médica y protocolos de aclimatación en ruta.</li>
+        <li>Mantener la comunicación operativa antes, durante y después del viaje.</li>
+      </ul>
+
+      <h2>3. Confidencialidad y transferencia a terceros</h2>
+      <p>
+        {site.legalName} no vende ni comercializa bases de datos personales bajo ninguna circunstancia. Los datos solo se comparten con las entidades estrictamente necesarias para la ejecución legal del servicio turístico contratado (autoridades gubernamentales del santuario, empresas de transporte y aseguradoras de viaje en caso de siniestro).
+      </p>
+
+      <h2>4. Conservación y derechos ARCO</h2>
+      <p>
+        El titular de los datos puede ejercer en cualquier momento sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) remitiendo una solicitud escrita a <a href={`mailto:${site.email}`}>{site.email}</a> o presentándose en nuestra sede física de <strong>{site.address}</strong>.
+      </p>
+
+      <h2>5. Seguridad de la información</h2>
+      <p>
+        Implementamos medidas técnicas y organizativas para proteger la confidencialidad de sus datos frente a accesos no autorizados, pérdidas o alteraciones.
+      </p>
+
+      <p style="margin-top: 32px; font-size: 12px; color: var(--muted);">
+        <strong>Última actualización:</strong> Noviembre de 2026.
+      </p>
+    </article>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>

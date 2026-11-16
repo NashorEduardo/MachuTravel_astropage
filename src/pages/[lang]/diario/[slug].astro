@@ -1,0 +1,82 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { site } from '../../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../../i18n/utils';
+import { getBlogPostsByLocale, type LocalizedBlogPost } from '../../../i18n/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of SUPPORTED_LOCALES) {
+    const posts = await getBlogPostsByLocale(lang);
+    for (const post of posts) {
+      paths.push({
+        params: { lang, slug: post.slug },
+        props: { post },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  post: LocalizedBlogPost;
+}
+
+const { lang, slug } = Astro.params as { lang: SupportedLocale; slug: string };
+const { post } = Astro.props;
+const t = useTranslations(lang);
+const { Content } = await render(post);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${post.data.title} | ${site.name}`}
+  description={post.data.excerpt}
+  image={post.data.image || site.defaultImage}
+  type="article"
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <div class="breadcrumb-wrap">
+      <Breadcrumbs
+        items={[
+          { label: t.nav.home, href: `/${lang}/` },
+          { label: t.nav.journal, href: `/${lang}/diario` },
+          { label: post.data.title },
+        ]}
+      />
+    </div>
+
+    <article class="legal-page section-wrap" style="max-width: 860px; padding-bottom: 100px;">
+      <p class="section-label">
+        <span>✦</span> {post.data.place} · {post.data.date}
+      </p>
+      <h1 style="font-size: clamp(32px, 4.5vw, 52px); margin: 16px 0 24px; line-height: 1.15;">
+        {post.data.title}
+      </h1>
+      <p style="font-size: 18px; color: #5a5749; line-height: 1.7; font-style: italic; border-left: 3px solid var(--inti-deep); padding-left: 18px; margin-bottom: 40px;">
+        {post.data.excerpt}
+      </p>
+
+      <div class="markdown-content" style="font-size: 16px; line-height: 1.8; color: #3a3932;">
+        <Content />
+      </div>
+
+      <div style="margin-top: 60px; padding-top: 28px; border-top: 1px solid #e8e3d5; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap;">
+        <a class="button button--dark" href={`/${lang}/diario`}>
+          ← {t.common.backToHome}
+        </a>
+        <a class="button button--gold" href={`/${lang}/rutas`}>
+          {t.catalog.exploreBtn} ↗
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>

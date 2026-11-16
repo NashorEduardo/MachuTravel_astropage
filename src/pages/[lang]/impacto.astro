@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site, waLink } from '../../data/site';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.socialImpactPage.heroTitle} ${t.socialImpactPage.heroTitleEm} | Machupicchu Beyond`}
+  description={t.socialImpactPage.heroDesc}
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.impact },
+          ]}
+        />
+      </div>
+      <p class="section-label">
+        <span>✦</span> {t.socialImpactPage.heroKicker}
+      </p>
+      <h1>
+        {t.socialImpactPage.heroTitle}<br />
+        <em>{t.socialImpactPage.heroTitleEm}</em>
+      </h1>
+      <p>
+        {t.socialImpactPage.heroDesc}
+      </p>
+    </section>
+
+    <!-- TRES PILARES DE IMPACTO -->
+    <section class="section-wrap" style="padding-block: 60px 40px;" data-reveal>
+      <div class="value-grid">
+        <article class="glass-glow-card" data-tilt>
+          <span style="font-size: 28px;" aria-hidden="true">🌾</span>
+          <h3 style="margin: 14px 0 10px; font-size: 22px;">{t.socialImpactPage.pillar1Title}</h3>
+          <p style="color: #555347; line-height: 1.7; font-size: 14px;">
+            {t.socialImpactPage.pillar1Desc}
+          </p>
+          <div class="pillar-points">
+            <span>✓ Contratación directa de arrieros y porteadores locales</span>
+            <span>✓ Pago justo por encima del promedio del mercado</span>
+            <span>✓ Hospedaje vivencial que retribuye a las familias anfitrionas</span>
+          </div>
+        </article>
+
+        <article class="glass-glow-card" data-tilt>
+          <span style="font-size: 28px;" aria-hidden="true">🎒</span>
+          <h3 style="margin: 14px 0 10px; font-size: 22px;">{t.socialImpactPage.pillar2Title}</h3>
+          <p style="color: #555347; line-height: 1.7; font-size: 14px;">
+            {t.socialImpactPage.pillar2Desc}
+          </p>
+          <div class="pillar-points">
+            <span>✓ Aporte en útiles escolares y libros para aulas rurales</span>
+            <span>✓ Campañas de abrigo ante el friaje en comunidades de altura</span>
+            <span>✓ Apoyo logístico para traslados y actividades infantiles</span>
+          </div>
+        </article>
+
+        <article class="glass-glow-card" data-tilt>
+          <span style="font-size: 28px;" aria-hidden="true">🌲</span>
+          <h3 style="margin: 14px 0 10px; font-size: 22px;">{t.socialImpactPage.pillar3Title}</h3>
+          <p style="color: #555347; line-height: 1.7; font-size: 14px;">
+            {t.socialImpactPage.pillar3Desc}
+          </p>
+          <div class="pillar-points">
+            <span>✓ Protección de los bosques nativos de Queñual (Polylepis)</span>
+            <span>✓ Filosofía de Cero Residuos y No Dejar Rastro en la montaña</span>
+            <span>✓ Cuidado de lagunas y fuentes de agua glaciar</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- BLOQUE CLARO DE PENDIENTES DEL CLIENTE (MÉTRICAS Y FOTOS REALES) -->
+    <section class="section-wrap" style="padding-bottom: 90px;" data-reveal>
+      <div class="client-todo-card">
+        <div class="todo-badge">ESPACIO PREPARADO PARA EL CLIENTE · TRANSPARENCIA ÉTICA</div>
+        <h2>{t.socialImpactPage.clientTodoTitle}</h2>
+        <p>
+          {t.socialImpactPage.clientTodoNotice} No publicamos cifras inventadas ni porcentajes decorativos: cada proyecto se sustentará con fotografías oficiales y convenios con las comunidades campesinas.
+        </p>
+
+        <div class="todo-fields-grid">
+          <div class="todo-field-box">
+            <b>TODO(cliente): Proyectos Comunitarios</b>
+            <p>Listar nombres oficiales de las comunidades campesinas aliadas (ej. Paucartambo, Pacchanta, Acomayo), proyectos activos y actas comunales.</p>
+          </div>
+          <div class="todo-field-box">
+            <b>TODO(cliente): Campañas Educativas e Infantiles</b>
+            <p>Consignar escuelas rurales beneficiadas, número de niños alcanzados por kits escolares y fechas de entregas anuales.</p>
+          </div>
+          <div class="todo-field-box">
+            <b>TODO(cliente): Forestación y Conservación</b>
+            <p>Registrar iniciativas de reforestación de queñuales, jornadas de limpieza de senderos y alianzas con guardaparques locales.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 32px; text-align: center;">
+          <a class="button button--gold" href={waLink('Hola, leí su página de Responsabilidad Social y quisiera conocer cómo apoya cada viaje a las comunidades.')} target="_blank" rel="noopener noreferrer">
+            Conversar sobre nuestro compromiso social <span>💬</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .pillar-points {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--machu-deep);
+    font-weight: 500;
+  }
+  .client-todo-card {
+    background: #ffffff;
+    border: 2px dashed rgba(89, 103, 64, 0.35);
+    border-radius: 16px;
+    padding: clamp(28px, 5vw, 48px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  }
+  .todo-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--machu-deep);
+    background: rgba(89, 103, 64, 0.12);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .client-todo-card h2 {
+    font-size: clamp(24px, 3vw, 32px);
+    margin: 0 0 14px;
+    color: var(--andean);
+  }
+  .client-todo-card p {
+    color: #555347;
+    line-height: 1.7;
+    max-width: 800px;
+  }
+  .todo-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 28px;
+  }
+  .todo-field-box {
+    background: #fbf9f4;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #ede8dc;
+  }
+  .todo-field-box b {
+    display: block;
+    color: var(--machu-deep);
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .todo-field-box p {
+    font-size: 12px;
+    color: #6a685c;
+    margin: 0;
+    line-height: 1.6;
+  }
+</style>

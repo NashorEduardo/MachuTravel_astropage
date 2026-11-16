@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteHeader from '../../../components/SiteHeader.astro';
+import SiteFooter from '../../../components/SiteFooter.astro';
+import TourCatalog from '../../../components/TourCatalog.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { SUPPORTED_LOCALES, useTranslations, type SupportedLocale } from '../../../i18n/utils';
+import { getToursByLocale } from '../../../i18n/content';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLocale };
+const t = useTranslations(lang);
+const allTours = await getToursByLocale(lang);
+const tours = allTours.filter((tour) => tour.data.kind === 'ceremonia');
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t.catalog.filterCeremonies} en Cusco | Machupicchu Beyond`}
+  description="Ceremonias de Despacho a la Pachamama y retiros de introspección en Cusco guiados por auténticos maestros andinos."
+>
+  <SiteHeader lang={lang} />
+
+  <main id="main-content">
+    <section class="page-hero">
+      <div class="breadcrumb-wrap" style="padding: 0; margin-bottom: 24px;">
+        <Breadcrumbs
+          items={[
+            { label: t.nav.home, href: `/${lang}/` },
+            { label: t.nav.routes, href: `/${lang}/rutas` },
+            { label: t.catalog.filterCeremonies },
+          ]}
+        />
+      </div>
+      <p class="section-label">
+        <span>✦</span> RITOS DE AYNI · RECIPROCIDAD · ESPIRITUALIDAD VIVA
+      </p>
+      <h1>
+        Ceremonias Andinas<br />
+        <em>con presencia y respeto.</em>
+      </h1>
+      <p>
+        Espacios sagrados de ofrenda y armonización con la Madre Tierra conducidos por maestros y maestras tradicionales en parajes protegidos del Valle Sagrado y Cusco.
+      </p>
+    </section>
+
+    <section class="catalog section-wrap" style="padding-bottom: 90px;">
+      <TourCatalog tours={tours} showFilters={true} lang={lang} activeCategory="ceremonia" />
+    </section>
+  </main>
+
+  <SiteFooter lang={lang} />
+</BaseLayout>
